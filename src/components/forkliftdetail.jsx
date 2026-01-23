@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import { getDealerDetail } from "../services/dealerService";
 
@@ -1357,6 +1358,15 @@ return
     this.updateStateWithDiscount({ selectedAircon: aircon }, newprice, { selectedAircon: aircon });
   };
 
+  getUserInitials(fullname) {
+    if (!fullname) return "U";
+    const names = fullname.split(" ");
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+    return fullname.substring(0, 2).toUpperCase();
+  }
+
   addMFHCapacity = ()=> {
 
     if (this.state.selectedMastSize &&
@@ -1388,16 +1398,157 @@ return
     const ConditionalWrapper = ({ condition, wrapper, children }) =>
       condition ? wrapper(children) : null;
 
-      if (this.state.modeldescription && this.state.modeldescription[0].description==='Coming Soon')
-        return ( <React.Fragment><h2>{this.state.model}</h2><h3>Coming Soon</h3></React.Fragment>);
+    if (!this.state.user) return <p>Loading...</p>;
 
-      if (this.state.modeldescription && this.state.modeldescription[0].description==='Available - POA')
-        return ( <React.Fragment><h2>{this.state.model}</h2><h3>Available - POA</h3></React.Fragment>);
+    const { user } = this.state;
+    const isAdmin = user.isAdmin;
 
-  
+    if (this.state.modeldescription && this.state.modeldescription[0].description==='Coming Soon') {
+      return (
+        <div className="page-container">
+          <header className="header">
+            <div className="header-logo">
+              <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            </div>
+            <nav className="header-nav">
+              <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+                Main Site
+              </a>
+              <div className="header-user">
+                <div className="header-user-info">
+                  <p className="header-user-name">{user.fullname || user.email}</p>
+                  <p className={`header-user-role ${isAdmin ? 'admin' : ''}`}>
+                    {isAdmin ? 'Administrator' : user.isMaximGB ? 'Maximal GB' : 'Dealer'}
+                  </p>
+                </div>
+                <div className="header-avatar">
+                  {this.getUserInitials(user.fullname || user.email)}
+                </div>
+                <Link to="/logout" className="btn-icon btn-ghost" title="Sign out">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </Link>
+              </div>
+            </nav>
+          </header>
+          <main className="main-content">
+            <Link to="/forklifts" className="back-link">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Forklifts
+            </Link>
+            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+              <h2>{this.state.model}</h2>
+              <h3>Coming Soon</h3>
+            </div>
+          </main>
+          <footer className="footer">
+            <div className="footer-content">
+              <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
+              <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
+                maximalforklift.co.uk
+              </a>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    if (this.state.modeldescription && this.state.modeldescription[0].description==='Available - POA') {
+      return (
+        <div className="page-container">
+          <header className="header">
+            <div className="header-logo">
+              <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            </div>
+            <nav className="header-nav">
+              <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+                Main Site
+              </a>
+              <div className="header-user">
+                <div className="header-user-info">
+                  <p className="header-user-name">{user.fullname || user.email}</p>
+                  <p className={`header-user-role ${isAdmin ? 'admin' : ''}`}>
+                    {isAdmin ? 'Administrator' : user.isMaximGB ? 'Maximal GB' : 'Dealer'}
+                  </p>
+                </div>
+                <div className="header-avatar">
+                  {this.getUserInitials(user.fullname || user.email)}
+                </div>
+                <Link to="/logout" className="btn-icon btn-ghost" title="Sign out">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </Link>
+              </div>
+            </nav>
+          </header>
+          <main className="main-content">
+            <Link to="/forklifts" className="back-link">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Forklifts
+            </Link>
+            <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+              <h2>{this.state.model}</h2>
+              <h3>Available - POA</h3>
+            </div>
+          </main>
+          <footer className="footer">
+            <div className="footer-content">
+              <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
+              <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
+                maximalforklift.co.uk
+              </a>
+            </div>
+          </footer>
+        </div>
+      );
+    }
    
     return (
-      <React.Fragment>
+      <div className="page-container">
+        {/* Header */}
+        <header className="header">
+          <div className="header-logo">
+            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+          </div>
+          <nav className="header-nav">
+            <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+              Main Site
+            </a>
+            <div className="header-user">
+              <div className="header-user-info">
+                <p className="header-user-name">{user.fullname || user.email}</p>
+                <p className={`header-user-role ${isAdmin ? 'admin' : ''}`}>
+                  {isAdmin ? 'Administrator' : user.isMaximGB ? 'Maximal GB' : 'Dealer'}
+                </p>
+              </div>
+              <div className="header-avatar">
+                {this.getUserInitials(user.fullname || user.email)}
+              </div>
+              <Link to="/logout" className="btn-icon btn-ghost" title="Sign out">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </Link>
+            </div>
+          </nav>
+        </header>
+
+        {/* Main Content */}
+        <main className="main-content" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <Link to="/forklifts" className="back-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Forklifts
+          </Link>
+
+          {/* Offer Banners */}
     
           {this.state.offer ? <div>
           <Offertext model={this.state.model}/>
@@ -2570,7 +2721,18 @@ return
             ) : null}
           </Grid>
         </Grid>
-      </React.Fragment>
+        </main>
+
+        {/* Footer */}
+        <footer className="footer">
+          <div className="footer-content">
+            <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
+            <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
+              maximalforklift.co.uk
+            </a>
+          </div>
+        </footer>
+      </div>
     );
   }
 }
