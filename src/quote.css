@@ -1,0 +1,186 @@
+h2 {
+  margin-bottom: 0;
+  margin-top: 25px;
+}
+
+.fullpage {
+  width: 1000px;
+}
+
+#ranges {
+  width: 500px;
+  float: left;
+}
+
+#filters {
+  width: 400px;
+  float: right;
+}
+
+ul {
+  list-style: none;
+}
+
+#filters {
+  list-style: none;
+  margin: 0 auto 10px;
+}
+
+.filter-hed {
+  float: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #333;
+  padding: 5px 10px 5px 0;
+  margin: 5px 0 5px 0;
+}
+
+#filters a {
+  background: #262626;
+  color: #666;
+}
+
+#filters a:hover,
+#filters a:focus {
+  color: #fff;
+  background: #df4747;
+}
+
+#filters button {
+  background: #262626;
+  color: #666;
+}
+
+#filters button:hover {
+  color: #fff;
+  background: #df4747;
+}
+
+/* below does not come into play */
+#filters .current a {
+  background: #df4747;
+  color: #fff;
+}
+
+/* below does not come into play */
+#filters .dim a {
+  background: #fefefe;
+  color: #999;
+}
+
+#filters li a {
+  float: left;
+  padding: 5px 10px;
+  margin: 5px 8px 5px 0;
+  background: #eee;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -o-border-radius: 12px;
+  -ms-border-radius: 12px;
+  border-radius: 12px;
+}
+
+#filters li button {
+  float: left;
+  padding: 5px 10px;
+  margin: 5px 8px 5px 0;
+  background: #eee;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -o-border-radius: 12px;
+  -ms-border-radius: 12px;
+  border-radius: 12px;
+}
+
+#filters button.current {
+  background: #df4747;
+  color: #fff;
+}
+
+#filters li:last-child {
+  margin-right: 0;
+}
+
+#filters {
+  width: 500px;
+  margin: 0 auto 10px;
+  clear: both;
+}
+
+.filter-hed {
+  float: left;
+}
+
+#filters a {
+  -webkit-transition: background-color 0.2s ease !important;
+  -moz-transition: background-color 0.2s ease !important;
+  -o-transition: background-color 0.2s ease !important;
+  -ms-transition: background-color 0.2s ease !important;
+  transition: background-color 0.2s ease !important;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -o-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+#filters li a {
+  float: left;
+}
+
+#filters button {
+  -webkit-transition: background-color 0.2s ease !important;
+  -moz-transition: background-color 0.2s ease !important;
+  -o-transition: background-color 0.2s ease !important;
+  -ms-transition: background-color 0.2s ease !important;
+  transition: background-color 0.2s ease !important;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -o-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+#filters li button {
+  float: left;
+}
+
+#filters:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+#filters,
+.about .pub li a,
+.prev-ed-list li a:link,
+.btn,
+#sub2,
+#sub3,
+.read .by,
+footer[role="contentinfo"],
+#results .permalink,
+.caption,
+.illo p,
+#contact-form label {
+  font-size: 12px !important;
+}
+
+#ranges li a {
+  background: #eee;
+  color: #666;
+  padding: 5px 10px;
+  margin: 5px 8px 5px 0;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  -o-border-radius: 12px;
+  -ms-border-radius: 12px;
+  border-radius: 12px;
+}
+
+#ranges li a:hover {
+  color: #fff;
+  background: #df4747;
+}
