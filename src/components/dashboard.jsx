@@ -257,44 +257,6 @@ class Dashboard extends Component {
             </>
           )}
 
-          {/* Quick Stats */}
-          <div className="card">
-            <h3 className="section-title">Quick Stats</h3>
-            <div className="grid-4">
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0' }}>
-                  12
-                </p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', margin: 0 }}>
-                  Active Quotes
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0' }}>
-                  £48,250
-                </p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', margin: 0 }}>
-                  This Month
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0' }}>
-                  156
-                </p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', margin: 0 }}>
-                  Stock Items
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0' }}>
-                  3
-                </p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', margin: 0 }}>
-                  New Offers
-                </p>
-              </div>
-            </div>
-          </div>
         </main>
 
         {/* Footer */}
