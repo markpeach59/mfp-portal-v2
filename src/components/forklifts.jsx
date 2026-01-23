@@ -15,7 +15,7 @@ import { getDealerDetail } from "../services/dealerService";
 import EnginesFilter from "./enginesfilter";
 import CapacityFilter from "./capacityfilter";
 import ResetFilters from "./resetfilters";
-import ViewOfferBox from "./viewofferbox";
+// import ViewOfferBox from "./viewofferbox";
 
 
 
@@ -209,7 +209,7 @@ class Forklifts extends Component {
 
     return (
       <React.Fragment>
-        <ViewOfferBox />
+        {/* <ViewOfferBox /> */}
         <Grid container>
         <Grid item xs={2}>
         {this.state.user &&
