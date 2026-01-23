@@ -93,9 +93,9 @@ class Orders extends Component {
       <div className="page-container">
         {/* Header */}
         <header className="header">
-          <div className="header-logo">
+          <Link to="/" className="header-logo">
             <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
-          </div>
+          </Link>
           <nav className="header-nav">
             <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
               Main Site
