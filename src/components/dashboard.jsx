@@ -172,14 +172,7 @@ class Dashboard extends Component {
         {/* Header */}
         <header className="header">
           <div className="header-logo">
-            <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-              <rect width="40" height="40" rx="8" fill="#E31837"/>
-              <path d="M10 28V12H14.5L20 22L25.5 12H30V28H26V18L21 27H19L14 18V28H10Z" fill="white"/>
-            </svg>
-            <div className="header-logo-text">
-              <span className="header-logo-title">MAXIMAL</span>
-              <span className="header-logo-subtitle">FORKLIFTS UK</span>
-            </div>
+            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
           </div>
           <nav className="header-nav">
             <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
@@ -307,7 +300,7 @@ class Dashboard extends Component {
         {/* Footer */}
         <footer className="footer">
           <div className="footer-content">
-            <p className="footer-text">© 2024 Maximal UK - Dealer Portal</p>
+            <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
             <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
               maximalforklift.co.uk
             </a>
