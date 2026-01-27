@@ -9,9 +9,10 @@ import "./styles/portal.css";
 // New components
 import Dashboard from "./components/dashboard";
 import ConfiguratorLayout from "./components/configuratorlayout";
-import StockList from "./components/stocklist";
-import Marketing from "./components/marketing";
-import Offers from "./components/offers";
+import StockListNew from "./components/stocklist";
+import MarketingGalleryNew from "./components/MarketingGallery";
+import OffersGridNew from "./components/OffersGrid";
+import AdminFileManager from "./components/AdminFileManager";
 
 // Existing components
 import ForkliftDetail from "./components/forkliftdetail";
@@ -53,9 +54,9 @@ class App extends Component {
         <ProtectedRoute path="/configurator" component={ConfiguratorLayout} />
 
         {/* Stock, Marketing, Offers */}
-        <ProtectedRoute path="/stock" component={StockList} />
-        <ProtectedRoute path="/marketing" component={Marketing} />
-        <ProtectedRoute path="/offers" component={Offers} />
+        <ProtectedRoute path="/stock" component={StockListNew} />
+        <ProtectedRoute path="/marketing" component={MarketingGalleryNew} />
+        <ProtectedRoute path="/offers" component={OffersGridNew} />
 
         {/* Forklift detail page */}
         <ProtectedRoute exact path="/forkliftdetail/:modelName" component={ForkliftDetail} />
@@ -71,6 +72,7 @@ class App extends Component {
         <ProtectedAdminRoute path="/admin/dealers" component={ListAllDealers} />
         <ProtectedAdminRoute path="/admin/register-user" component={RegistrationForm} />
         <ProtectedAdminRoute path="/admin/register-dealer" component={DealerRegistrationForm} />
+        <ProtectedAdminRoute path="/admin/files" component={AdminFileManager} />
 
         {/* Legacy redirects for backward compatibility */}
         <Redirect from="/forklifts" to="/configurator/build" />
