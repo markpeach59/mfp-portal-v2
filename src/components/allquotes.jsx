@@ -73,12 +73,14 @@ class AllQuotes extends Component {
     };
 
     const totalValue = t.reduce((sum, quote) => {
-      if (quote.hasDiscount) {
+      if (quote.hasDiscount && quote.discountedPrice != null) {
         return sum + quote.discountedPrice;
-      } else if (quote.saving) {
+      } else if (quote.saving != null && quote.price != null) {
         return sum + (quote.price - quote.saving);
+      } else if (quote.price != null) {
+        return sum + quote.price;
       }
-      return sum + quote.price;
+      return sum;
     }, 0);
 
     return (
@@ -231,12 +233,12 @@ class AllQuotes extends Component {
                           ) : null}
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          {x.hasDiscount && (
+                          {x.hasDiscount && x.discountAmount != null && (
                             <span style={{ color: 'var(--color-success)', fontWeight: '500' }}>
                               £{x.discountAmount.toLocaleString()}
                             </span>
                           )}
-                          {!x.hasDiscount && x.saving && (
+                          {!x.hasDiscount && x.saving != null && (
                             <span style={{ color: 'var(--color-success)', fontWeight: '500' }}>
                               £{x.saving.toLocaleString()}
                             </span>
@@ -244,9 +246,10 @@ class AllQuotes extends Component {
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <span style={{ fontWeight: '600', color: 'var(--color-gray-800)' }}>
-                            {x.hasDiscount && `£${x.discountedPrice.toLocaleString()}`}
-                            {!x.hasDiscount && x.saving && `£${(x.price - x.saving).toLocaleString()}`}
-                            {!x.hasDiscount && !x.saving && `£${x.price.toLocaleString()}`}
+                            {x.hasDiscount && x.discountedPrice != null && `£${x.discountedPrice.toLocaleString()}`}
+                            {!x.hasDiscount && x.saving != null && x.price != null && `£${(x.price - x.saving).toLocaleString()}`}
+                            {!x.hasDiscount && !x.saving && x.price != null && `£${x.price.toLocaleString()}`}
+                            {x.price == null && '-'}
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>

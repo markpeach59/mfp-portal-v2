@@ -88,8 +88,8 @@ class Orders extends Component {
               {orders.map((order) => {
                 const status = this.getStatusBadge(order);
                 const total = order.hasDiscount 
-                  ? order.discountedPrice + order.markup
-                  : order.price + order.markup;
+                  ? (order.discountedPrice || 0) + (order.markup || 0)
+                  : (order.price || 0) + (order.markup || 0);
 
                 return (
                   <tr key={order._id}>
@@ -114,7 +114,7 @@ class Orders extends Component {
                       £{order.price?.toLocaleString()}
                     </td>
                     <td style={{ textAlign: 'right', color: 'var(--color-gray-700)' }}>
-                      {order.markup > 0 ? `£${order.markup.toLocaleString()}` : '-'}
+                      {order.markup > 0 ? `£${order.markup?.toLocaleString()}` : '-'}
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <span className={`badge ${status.class}`}>
@@ -201,8 +201,8 @@ class Orders extends Component {
               <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: 0 }}>
                 £{orders.reduce((sum, o) => {
                   const total = o.hasDiscount 
-                    ? o.discountedPrice + o.markup
-                    : o.price + o.markup;
+                    ? (o.discountedPrice || 0) + (o.markup || 0)
+                    : (o.price || 0) + (o.markup || 0);
                   return sum + total;
                 }, 0).toLocaleString()}
               </p>

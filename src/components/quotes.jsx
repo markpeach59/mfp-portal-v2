@@ -99,10 +99,10 @@ class Quotes extends Component {
               {quotes.map((quote) => {
                 const status = this.getStatusBadge(quote);
                 const total = quote.hasDiscount 
-                  ? quote.discountedPrice + quote.markup
+                  ? (quote.discountedPrice || 0) + (quote.markup || 0)
                   : (!quote.hasDiscount && quote.saving 
-                    ? quote.price - quote.saving + quote.markup
-                    : quote.price + quote.markup);
+                    ? (quote.price || 0) - (quote.saving || 0) + (quote.markup || 0)
+                    : (quote.price || 0) + (quote.markup || 0));
 
                 return (
                   <tr key={quote._id}>
@@ -127,7 +127,7 @@ class Quotes extends Component {
                       £{quote.price?.toLocaleString()}
                     </td>
                     <td style={{ textAlign: 'right', color: 'var(--color-gray-700)' }}>
-                      {quote.markup > 0 ? `£${quote.markup.toLocaleString()}` : '-'}
+                      {quote.markup > 0 ? `£${quote.markup?.toLocaleString()}` : '-'}
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <span className={`badge ${status.class}`}>
@@ -188,10 +188,10 @@ class Quotes extends Component {
               <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: 0 }}>
                 £{quotes.reduce((sum, q) => {
                   const total = q.hasDiscount 
-                    ? q.discountedPrice + q.markup
+                    ? (q.discountedPrice || 0) + (q.markup || 0)
                     : (!q.hasDiscount && q.saving 
-                      ? q.price - q.saving + q.markup
-                      : q.price + q.markup);
+                      ? (q.price || 0) - (q.saving || 0) + (q.markup || 0)
+                      : (q.price || 0) + (q.markup || 0));
                   return sum + total;
                 }, 0).toLocaleString()}
               </p>
