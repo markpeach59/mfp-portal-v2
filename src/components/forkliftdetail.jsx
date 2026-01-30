@@ -1411,7 +1411,7 @@ return
               <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
             </div>
             <nav className="header-nav">
-              <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+              <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
                 Main Site
               </a>
               <div className="header-user">
@@ -1464,7 +1464,7 @@ return
               <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
             </div>
             <nav className="header-nav">
-              <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+              <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
                 Main Site
               </a>
               <div className="header-user">
@@ -1517,7 +1517,7 @@ return
             <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
-            <a href="https://maximal.tlhdev.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+            <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
               Main Site
             </a>
             <div className="header-user">

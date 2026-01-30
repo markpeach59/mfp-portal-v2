@@ -42,7 +42,7 @@ class LoginForm extends Component {
             <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
           </div>
           <a 
-            href="https://maximal.tlhdev.co.uk" 
+            href="https://maximalforklift.co.uk"
             className="header-link"
             style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}
           >
@@ -189,7 +189,7 @@ class LoginForm extends Component {
             {/* Help Text */}
             <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--color-gray-500)' }}>
               Need dealer access?{' '}
-              <a href="https://maximal.tlhdev.co.uk" style={{ color: 'var(--color-primary)', fontWeight: '500', textDecoration: 'none' }}>
+              <a href="https://maximalforklift.co.uk" style={{ color: 'var(--color-primary)', fontWeight: '500', textDecoration: 'none' }}>
                 Contact Maximal UK
               </a>
             </p>
