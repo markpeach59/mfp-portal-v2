@@ -201,10 +201,10 @@ class ListAllUsers extends Component {
                   </div>
                   <div>
                     <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-gray-500)', marginBottom: '0.5rem' }}>
-                      Dealers
+                      Dealer Companies
                     </p>
                     <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: 0 }}>
-                      {u.filter(user => !user.isAdmin && !user.isMaximGB).length}
+                      {d.length}
                     </p>
                   </div>
                 </div>
