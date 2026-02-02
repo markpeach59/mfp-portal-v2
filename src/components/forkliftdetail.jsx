@@ -1101,6 +1101,15 @@ return
     this.updateStateWithDiscount({ selectedSteering: steering }, newprice, { selectedSteering: steering });
   };
 
+  handleTiltfunctionSel = (tiltfunction) => {
+    const oldprice = this.state.selectedTiltfunction
+      ? this.state.selectedTiltfunction.price
+      : 0;
+    const newprice = this.state.totalprice + tiltfunction.price - oldprice;
+
+    this.updateStateWithDiscount({ selectedTiltfunction: tiltfunction }, newprice, { selectedTiltfunction: tiltfunction });
+  };
+
  handleTyreSel = (tyre) => {
     const oldprice = this.state.selectedTyre
       ? this.state.selectedTyre.price
