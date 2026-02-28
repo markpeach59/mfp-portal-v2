@@ -1243,11 +1243,10 @@ return
       ? this.state.selectedBattery.price
       : 0;
 
-    const oldprice2 = this.state.selectedCharger
-      ? this.state.selectedCharger.price
-      : 0;
-    const newprice =
-      this.state.totalprice + battery.price - oldprice - oldprice2;
+    var oldprice2 = 0; /* only needed if charger options are part of battery choices */
+
+    let newprice =
+      this.state.totalprice + battery.price - oldprice ;
 
       
       console.log ('Chargers', battery.chargers)
@@ -1256,6 +1255,12 @@ return
     
 
       if (battery.chargers && battery.chargers.length > 0 ){
+ /* onlty if chargers available - we need to consider price of any existing charger selection - in the case where the charger is also deselected & reininitialised when chnaging battery choice  */
+        oldprice2 = this.state.selectedCharger
+      ? this.state.selectedCharger.price
+      : 0;
+
+        newprice = newprice - oldprice2;
 
          this.updateStateWithDiscount({
       selectedBattery: battery,
