@@ -17,13 +17,20 @@ const Engines = (props) => {
     aa = selectedEngine.enginetype;
   }
 
+  // Check if any engine has a message to display
+  const engineMessage = engines.find(engine => engine.message)?.message;
+
   return (
     <React.Fragment>
       <FormControl component="fieldset">
         <FormLabel component="legend">Engine</FormLabel>
-        <Typography variant="caption" style={{ fontSize: '0.75rem', marginTop: '4px', marginBottom: '4px' }}>
-          Please note that the Xinchai engine is only available on an M Series Chassis
-        </Typography>
+        
+        {/* Conditionally display message if it exists in the engines data */}
+        {engineMessage && (
+          <Typography variant="caption" style={{ fontSize: '0.75rem', marginTop: '4px', marginBottom: '4px' }}>
+            {engineMessage}
+          </Typography>
+        )}
 
         <RadioGroup aria-label="engines" name="engines" row={true}>
           {engines.map((engine) => (
