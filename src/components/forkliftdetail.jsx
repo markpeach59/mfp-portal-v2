@@ -2208,7 +2208,7 @@ return
             >
               {this.state.selectedCabin
                ? this.state.selectedCabin.cabinoption
-    :  (this.state.model === "FDTA80" || this.state.model === "FDTA100")
+    :  (this.state.model === "FDTA80" || this.state.model === "FDTA100"|| this.state.model === "FBAX80-YPZ" || this.state.model === "FBAX100-YPZ")
       ? "Closed Roof"
       : "Plastic top cover"}
             </ConditionalWrapper>
