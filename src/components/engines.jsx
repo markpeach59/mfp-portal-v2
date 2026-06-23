@@ -17,8 +17,10 @@ const Engines = (props) => {
     aa = selectedEngine.enginetype;
   }
 
-  // Check if any engine has a message to display
-  const engineMessage = engines.find(engine => engine.message)?.message;
+  // Only display a message if we are dealing with Diesel engines (message is optional on the engine object)
+  const engineMessage = engines.find(
+    engine => engine.enginetype?.toLowerCase().includes('diesel') && engine.message
+  )?.message;
 
   return (
     <React.Fragment>

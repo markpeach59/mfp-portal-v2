@@ -30,6 +30,7 @@ import Bfs from "./bfs";
 
 import Rollers from "./rollers";
 import Pincode from "./pincode";
+import Keypad from "./keypad";
 import Displaywithcamera from "./displaywithcamera";
 import Liftybutton from "./liftybutton";
 import Stabiliser from "./stabiliser";
@@ -185,6 +186,7 @@ class ForkliftDetail extends Component {
       armguards: forky.armguard,
 
       pincodes: forky.pincode,
+      keypads: forky.keypad,
 
       defaultroller:forky.defaultroller,
       rollers:forky.rollers,
@@ -386,6 +388,7 @@ class ForkliftDetail extends Component {
       selectedPlatform: undefined,
 
       selectedPincode: undefined,
+      selectedKeypad: undefined,
       selectedRoller: undefined,
       selectedDisplaywithcamera: undefined,
       selectedLiftybutton: undefined,
@@ -597,6 +600,7 @@ class ForkliftDetail extends Component {
     if (this.state.selectedDisplaywithcamera) quote.displaywithcamera = true;
     if (this.state.selectedLiftybutton) quote.liftybutton = true;
     if (this.state.selectedPincode) quote.pincode = this.state.selectedPincode.pincodetype;
+    if (this.state.selectedKeypad) quote.keypad = true;
     if (this.state.selectedController) quote.controller = this.state.selectedController.controllertype;
 
     if (this.state.selectedSafetybluespot) quote.safetybluespot = true;
@@ -1032,6 +1036,13 @@ return
     const newprice = this.state.totalprice + pincode.price - oldprice;
 
     this.updateStateWithDiscount({ selectedPincode: pincode }, newprice, { selectedPincode: pincode });
+  };
+
+  handleKeypadSel = (keypad) => {
+    const oldprice = this.state.selectedKeypad ? this.state.selectedKeypad.price : 0;
+    const newprice = this.state.totalprice + keypad.price - oldprice;
+
+    this.updateStateWithDiscount({ selectedKeypad: keypad }, newprice, { selectedKeypad: keypad });
   };
 
   handleLiftybuttonSel = (liftybutton) => {
@@ -1876,6 +1887,18 @@ return
               {this.state.selectedPincode ? "Pincode" : null}
             </ConditionalWrapper>
 
+            <ConditionalWrapper
+              condition={this.state.selectedKeypad}
+              wrapper={(children) => (
+                <React.Fragment>
+                  {children}
+                  <br />
+                </React.Fragment>
+              )}
+            >
+              {this.state.selectedKeypad ? "Keypad Entry" : null}
+            </ConditionalWrapper>
+
 
             <ConditionalWrapper
               condition={this.state.selectedTiltfunction}
@@ -2577,6 +2600,14 @@ return
                 pincodes={this.state.pincodes}
                 selectedPincode={this.state.selectedPincode}
                 onPincodeSel={this.handlePincodeSel}
+              />
+            ) : null}
+
+            {this.state.keypads && this.state.keypads.length > 0 ? (
+              <Keypad
+                keypads={this.state.keypads}
+                selectedKeypad={this.state.selectedKeypad}
+                onKeypadSel={this.handleKeypadSel}
               />
             ) : null}
 
