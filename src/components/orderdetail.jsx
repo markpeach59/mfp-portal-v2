@@ -65,6 +65,7 @@ class OrderDetail extends Component {
       trolley: forky.manualtrolley,
       blinkey: forky.blinkey,
       sideextractionbattery: forky.sideextractionbattery,
+      keypad: forky.keypad,
     });
   }
 
@@ -200,6 +201,10 @@ class OrderDetail extends Component {
 
               <ConditionalWrapper condition={this.state.pincode} wrapper={(children) => <><br />{children}</>}>
                 {"Pincode"}
+              </ConditionalWrapper>
+
+              <ConditionalWrapper condition={this.state.keypad} wrapper={(children) => <><br />{children}</>}>
+                {"Keypad Entry"}
               </ConditionalWrapper>
 
               <ConditionalWrapper condition={this.state.displaywithcamera} wrapper={(children) => <><br />{children}</>}>
