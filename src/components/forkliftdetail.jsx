@@ -227,6 +227,9 @@ class ForkliftDetail extends Component {
       stabilisers: forky.stabiliser,
       sideextractionbatterys: forky.sideextractionbattery,
 
+      specsheet: forky.specsheet || '',
+      productpage: forky.productpage || '',
+
       restricted:restricted,
       totalprice: initialbaseprice,
       baseprice: initialbaseprice,
@@ -604,6 +607,9 @@ class ForkliftDetail extends Component {
     if (this.state.selectedController) quote.controller = this.state.selectedController.controllertype;
 
     if (this.state.selectedSafetybluespot) quote.safetybluespot = true;
+
+    if (this.state.specsheet) quote.specsheet = this.state.specsheet;
+    if (this.state.productpage) quote.productpage = this.state.productpage;
 
     //console.log("Quote", quote);//being sent
     try {
@@ -2378,6 +2384,19 @@ return
 
             <QuoteSave onQuoteSave={this.handleQuoteSave} forklift={this.state}/>
             <Markup currentMarkup={this.state.markup} onMarkup={this.handleMarkup} />
+
+            <div style={{ marginTop: '1rem' }}>
+              {this.state.productpage ? (
+                <div><a href={this.state.productpage} target="_blank" rel="noopener noreferrer">Product Page</a></div>
+              ) : (
+                <div><span style={{ color: '#aaa', cursor: 'not-allowed' }} title="Not available">Product Page</span></div>
+              )}
+              {this.state.specsheet ? (
+                <div><a href={this.state.specsheet} target="_blank" rel="noopener noreferrer">Spec Sheet</a></div>
+              ) : (
+                <div><span style={{ color: '#aaa', cursor: 'not-allowed' }} title="Not available">Spec Sheet</span></div>
+              )}
+            </div>
 
           </Grid>
           <Grid item xs={8}>

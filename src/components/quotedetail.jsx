@@ -78,6 +78,8 @@ class QuoteDetail extends Component {
       stabiliser: forky.stabiliser,
       sideextractionbattery: forky.sideextractionbattery,
       keypad: forky.keypad,
+      specsheet: forky.specsheet || '',
+      productpage: forky.productpage || '',
     });
   }
 
@@ -441,6 +443,19 @@ class QuoteDetail extends Component {
             <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <Generateorder onOrderCreate={this.handleCreateOrder} />
               <Markup currentMarkup={this.state.markup} onMarkup={this.handleMarkup} />
+            </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              {this.state.productpage ? (
+                <div><a href={this.state.productpage} target="_blank" rel="noopener noreferrer">Product Page</a></div>
+              ) : (
+                <div><span style={{ color: '#aaa', cursor: 'not-allowed' }} title="Not available">Product Page</span></div>
+              )}
+              {this.state.specsheet ? (
+                <div><a href={this.state.specsheet} target="_blank" rel="noopener noreferrer">Spec Sheet</a></div>
+              ) : (
+                <div><span style={{ color: '#aaa', cursor: 'not-allowed' }} title="Not available">Spec Sheet</span></div>
+              )}
             </div>
           </div>
         </main>
