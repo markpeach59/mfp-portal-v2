@@ -38,15 +38,18 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
     <>
       <div>
         <button
-          className="btn btn-primary"
+          className={disabled ? "btn btn-secondary" : "btn btn-primary"}
           onClick={handleOpen}
           disabled={disabled}
           style={{
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
-            opacity: disabled ? 0.45 : 1,
+            opacity: disabled ? 0.6 : 1,
             cursor: disabled ? "not-allowed" : "pointer",
+            backgroundColor: disabled ? "#e0e0e0" : undefined,
+            color: disabled ? "#9e9e9e" : undefined,
+            borderColor: disabled ? "#e0e0e0" : undefined,
           }}
         >
           <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
