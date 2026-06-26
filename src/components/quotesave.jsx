@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+No - you are allowing a quite to be saved when reuqired elements such as eat import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 
 const QuoteSave = ({ onQuoteSave, forklift }) => {
@@ -6,11 +6,17 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
 
-  let disabled = false;
+  // Determine what (if anything) is blocking the save
+  let blockingReason = null;
+  if (!forklift.selectedSeat && forklift.seatrequired) {
+    blockingReason = "Please select a seat option before saving.";
+  } else if (!forklift.powertrain && forklift.chassisrequired) {
+    blockingReason = "Please select a chassis option (Lead or Lithium) before saving.";
+  } else if (forklift.voltagerequired && !forklift.selectedVoltage) {
+    blockingReason = "Please select a battery model (Entry Level, Standard or Heavy Duty) before saving.";
+  }
 
-  if (!forklift.selectedSeat && forklift.seatrequired) { disabled = true; }
-  if (!forklift.powertrain && forklift.chassisrequired) { disabled = true; }
-  if (forklift.voltagerequired && !forklift.selectedVoltage) { disabled = true; }
+  const disabled = !!blockingReason;
 
   const handleOpen = () => {
     if (!disabled) {
@@ -32,10 +38,28 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
   return (
     <>
       <div>
-        {/* Using MUI Button so disabled styling (grey) works exactly as before */}
+        {/* MUI Button: automatically grey when disabled, same as original */}
         <Button onClick={handleOpen} disabled={disabled}>
           Save Quote
         </Button>
+
+        {/* Red reason message when disabled */}
+        {blockingReason && (
+          <p style={{
+            marginTop: "0.375rem",
+            fontSize: "0.8125rem",
+            color: "#c0392b",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "0.375rem",
+            lineHeight: "1.4",
+          }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: "0.125rem" }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            {blockingReason}
+          </p>
+        )}
       </div>
 
       {showModal && (
