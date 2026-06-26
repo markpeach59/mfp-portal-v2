@@ -13,7 +13,6 @@ class Quotes extends Component {
   }
 
   getStatusBadge(quote) {
-    // Determine status based on quote properties
     if (quote.hasDiscount || quote.saving > 0) {
       return { text: 'Special Offer', class: 'badge-warning' };
     }
@@ -85,8 +84,8 @@ class Quotes extends Component {
           <table className="table">
             <thead>
               <tr>
-                <th>Date & Time</th>
-                <th>Model</th>
+                <th>Ref &amp; Date</th>
+                <th>Title / Model</th>
                 <th style={{ textAlign: 'right' }}>Base Price</th>
                 <th style={{ textAlign: 'right' }}>Markup</th>
                 <th style={{ textAlign: 'center' }}>Status</th>
@@ -106,10 +105,30 @@ class Quotes extends Component {
 
                 return (
                   <tr key={quote._id}>
+                    {/* Ref & Date column */}
                     <td>
                       <Link to={`/quotedetail/${quote._id}`} style={{ textDecoration: 'none' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
-                          <span style={{ fontWeight: '500', color: 'var(--color-gray-800)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                          {/* Quote Ref badge */}
+                          {quote.quoteRef ? (
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              fontSize: '0.6875rem',
+                              fontWeight: '600',
+                              letterSpacing: '0.07em',
+                              textTransform: 'uppercase',
+                              color: 'var(--color-gray-500)',
+                              backgroundColor: 'var(--color-gray-100, #f3f4f6)',
+                              padding: '0.125rem 0.5rem',
+                              borderRadius: '999px',
+                              width: 'fit-content',
+                            }}>
+                              {quote.quoteRef}
+                            </span>
+                          ) : null}
+                          <span style={{ fontWeight: '500', color: 'var(--color-gray-800)', fontSize: '0.8125rem' }}>
                             {this.formatDate(quote.createdAt)}
                           </span>
                           <span style={{ fontSize: '0.75rem', color: 'var(--color-gray-500)' }}>
@@ -118,11 +137,29 @@ class Quotes extends Component {
                         </div>
                       </Link>
                     </td>
+
+                    {/* Title / Model column */}
                     <td>
-                      <span style={{ fontWeight: '500', color: 'var(--color-gray-700)' }}>
-                        {quote.model}
-                      </span>
+                      <Link to={`/quotedetail/${quote._id}`} style={{ textDecoration: 'none' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+                          {quote.title ? (
+                            <>
+                              <span style={{ fontWeight: '600', color: 'var(--color-gray-800)' }}>
+                                {quote.title}
+                              </span>
+                              <span style={{ fontSize: '0.8125rem', color: 'var(--color-gray-500)' }}>
+                                {quote.model}
+                              </span>
+                            </>
+                          ) : (
+                            <span style={{ fontWeight: '500', color: 'var(--color-gray-700)' }}>
+                              {quote.model}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
                     </td>
+
                     <td style={{ textAlign: 'right', color: 'var(--color-gray-700)' }}>
                       £{quote.price?.toLocaleString()}
                     </td>

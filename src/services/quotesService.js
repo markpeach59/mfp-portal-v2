@@ -8,8 +8,6 @@ export function getQuotes() {
 }
 
 export function savequote(quote) {
-  //console.log("quote items ", quote);
-
   return http.post(apiEndPoint, quote);
 }
 
@@ -30,7 +28,14 @@ export function reassignQuote(id, newuserid) {
 }
 
 export function saveMarkup(id, newmarkup) {
-    return http.patch(apiEndPoint + "/savemarkup/" + id, {
-      markup: newmarkup,
-    });
+  return http.patch(apiEndPoint + "/savemarkup/" + id, {
+    markup: newmarkup,
+  });
+}
+
+export function saveTitleNotes(id, title, notes) {
+  return http.patch(apiEndPoint + "/savetitlenotes/" + id, {
+    title: title || '',
+    notes: notes || '',
+  });
 }

@@ -428,13 +428,16 @@ class ForkliftDetail extends Component {
     });
   };
 
-  handleQuoteSave = async () => {
+  handleQuoteSave = async (title, notes) => {
     const quote = {};
 
     quote.userid = this.state.user._id;
     quote.model = this.state.model;
     quote.price = this.state.totalprice;
     quote.markup = this.state.markup;
+
+    if (title) quote.title = title;
+    if (notes) quote.notes = notes;
 
     quote.offer = this.state.offer;
 

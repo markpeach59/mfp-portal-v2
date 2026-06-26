@@ -4,7 +4,8 @@ import ForkliftImg from "./forkliftimg";
 import {
   getQuoteDetail,
   createOrderFromQuote,
-  saveMarkup
+  saveMarkup,
+  saveTitleNotes
 } from "../services/quotesService";
 import Markup from "./markup";
 import Generateorder from "./generateorder";
@@ -12,7 +13,12 @@ import auth from "../services/authService";
 
 class QuoteDetail extends Component {
   state = {
-    user: null
+    user: null,
+    // Title/Notes editing
+    editingTitleNotes: false,
+    editTitle: '',
+    editNotes: '',
+    savingTitleNotes: false,
   };
 
   async componentDidMount() {
@@ -23,6 +29,9 @@ class QuoteDetail extends Component {
     const { data: forky } = await getQuoteDetail(handle);
 
     this.setState({
+      quoteRef: forky.quoteRef || '',
+      title: forky.title || '',
+      notes: forky.notes || '',
       model: forky.model,
       price: forky.price,
       markup: forky.markup,
@@ -118,6 +127,39 @@ class QuoteDetail extends Component {
     }
   };
 
+  // --- Title & Notes editing ---
+
+  handleEditOpen = () => {
+    this.setState({
+      editingTitleNotes: true,
+      editTitle: this.state.title || '',
+      editNotes: this.state.notes || '',
+    });
+  };
+
+  handleEditCancel = () => {
+    this.setState({ editingTitleNotes: false });
+  };
+
+  handleEditSave = async () => {
+    const { editTitle, editNotes } = this.state;
+    const handle = this.props.match.params._id;
+
+    this.setState({ savingTitleNotes: true });
+    try {
+      await saveTitleNotes(handle, editTitle.trim(), editNotes.trim());
+      this.setState({
+        title: editTitle.trim(),
+        notes: editNotes.trim(),
+        editingTitleNotes: false,
+        savingTitleNotes: false,
+      });
+    } catch (error) {
+      console.log("Failed to save title/notes", error);
+      this.setState({ savingTitleNotes: false });
+    }
+  };
+
   render() {
     const { user } = this.state;
     if (!user) return <p>Loading...</p>;
@@ -125,6 +167,11 @@ class QuoteDetail extends Component {
     const isAdmin = user.isAdmin;
     const ConditionalWrapper = ({ condition, wrapper, children }) =>
       condition ? wrapper(children) : null;
+
+    const {
+      quoteRef, title, notes,
+      editingTitleNotes, editTitle, editNotes, savingTitleNotes
+    } = this.state;
 
     return (
       <div className="page-container">
@@ -166,8 +213,166 @@ class QuoteDetail extends Component {
           </Link>
 
           <div className="card">
-            <h2 className="page-title">{this.state.model}</h2>
-            
+            {/* Quote header: ref badge + model + edit button */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                {/* Quote Ref badge */}
+                {quoteRef && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.375rem',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-gray-500)',
+                      backgroundColor: 'var(--color-gray-100, #f3f4f6)',
+                      padding: '0.25rem 0.625rem',
+                      borderRadius: '999px',
+                      userSelect: 'all',
+                    }}>
+                      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                      </svg>
+                      {quoteRef}
+                    </span>
+                  </div>
+                )}
+
+                {/* Title (if set) */}
+                {title ? (
+                  <h2 className="page-title" style={{ marginBottom: '0.25rem' }}>{title}</h2>
+                ) : (
+                  <h2 className="page-title" style={{ marginBottom: '0.25rem' }}>{this.state.model}</h2>
+                )}
+                {/* Show model as subtitle when title is set */}
+                {title && (
+                  <p style={{ fontSize: '0.9375rem', color: 'var(--color-gray-500)', margin: 0 }}>{this.state.model}</p>
+                )}
+              </div>
+
+              {/* Edit Title & Notes button */}
+              {!editingTitleNotes && (
+                <button
+                  onClick={this.handleEditOpen}
+                  className="btn btn-secondary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+                >
+                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  {title || notes ? 'Edit Title & Notes' : 'Add Title & Notes'}
+                </button>
+              )}
+            </div>
+
+            {/* Title & Notes inline edit form */}
+            {editingTitleNotes && (
+              <div style={{
+                backgroundColor: 'var(--color-gray-50, #f9fafb)',
+                border: '1px solid var(--color-gray-200, #e5e7eb)',
+                borderRadius: 'var(--border-radius-lg, 0.75rem)',
+                padding: '1.25rem',
+                marginBottom: '1.5rem',
+              }}>
+                <p style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--color-gray-700)', marginBottom: '1rem' }}>
+                  Edit Title &amp; Notes
+                </p>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '500', color: 'var(--color-gray-600)', marginBottom: '0.375rem' }}>
+                    Title <span style={{ color: 'var(--color-gray-400)', fontWeight: '400' }}>(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => this.setState({ editTitle: e.target.value })}
+                    placeholder="e.g. ABC Ltd – 3 tonne diesel"
+                    maxLength={100}
+                    autoFocus
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem 0.75rem',
+                      border: '1px solid var(--color-gray-300, #d1d5db)',
+                      borderRadius: 'var(--border-radius, 0.375rem)',
+                      fontSize: '0.9375rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') this.handleEditCancel();
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: '500', color: 'var(--color-gray-600)', marginBottom: '0.375rem' }}>
+                    Notes <span style={{ color: 'var(--color-gray-400)', fontWeight: '400' }}>(optional)</span>
+                  </label>
+                  <textarea
+                    value={editNotes}
+                    onChange={(e) => this.setState({ editNotes: e.target.value })}
+                    placeholder="Any additional notes about this quote..."
+                    maxLength={1000}
+                    rows={4}
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem 0.75rem',
+                      border: '1px solid var(--color-gray-300, #d1d5db)',
+                      borderRadius: 'var(--border-radius, 0.375rem)',
+                      fontSize: '0.9375rem',
+                      outline: 'none',
+                      resize: 'vertical',
+                      boxSizing: 'border-box',
+                      fontFamily: 'inherit',
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') this.handleEditCancel();
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.625rem', justifyContent: 'flex-end' }}>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={this.handleEditCancel}
+                    disabled={savingTitleNotes}
+                    style={{ fontSize: '0.875rem' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={this.handleEditSave}
+                    disabled={savingTitleNotes}
+                    style={{ fontSize: '0.875rem', minWidth: '5rem' }}
+                  >
+                    {savingTitleNotes ? 'Saving…' : 'Save'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Notes display (when not editing) */}
+            {notes && !editingTitleNotes && (
+              <div style={{
+                backgroundColor: 'var(--color-gray-50, #f9fafb)',
+                border: '1px solid var(--color-gray-200, #e5e7eb)',
+                borderRadius: 'var(--border-radius, 0.375rem)',
+                padding: '0.875rem 1rem',
+                marginBottom: '1.25rem',
+              }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-gray-400)', marginBottom: '0.375rem' }}>
+                  Notes
+                </p>
+                <p style={{ fontSize: '0.9375rem', color: 'var(--color-gray-700)', margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+                  {notes}
+                </p>
+              </div>
+            )}
+
             {this.state.imgName && this.state.imgName.length > 0 ? (
               <div style={{ marginBottom: '1.5rem' }}>
                 <ForkliftImg imgName={this.state.imgName} />
