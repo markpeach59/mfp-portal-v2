@@ -77,6 +77,7 @@ class QuoteDetail extends Component {
       blinkey: forky.blinkey,
       stabiliser: forky.stabiliser,
       sideextractionbattery: forky.sideextractionbattery,
+      keypad: forky.keypad,
     });
   }
 
@@ -249,6 +250,10 @@ class QuoteDetail extends Component {
 
               <ConditionalWrapper condition={this.state.pincode} wrapper={(children) => <>{children}</>}>
                 {"Pincode, "}
+              </ConditionalWrapper>
+
+              <ConditionalWrapper condition={this.state.keypad} wrapper={(children) => <>{children}</>}>
+                {"Keypad Entry, "}
               </ConditionalWrapper>
 
               <ConditionalWrapper condition={this.state.displaywithcamera} wrapper={(children) => <>{children}</>}>
