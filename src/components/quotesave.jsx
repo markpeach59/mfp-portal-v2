@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import Button from "@material-ui/core/Button";
 
 const QuoteSave = ({ onQuoteSave, forklift }) => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
 
-  // Work out what (if anything) is blocking the save
-  let blockingReason = null;
-  if (!forklift.selectedSeat && forklift.seatrequired) {
-    blockingReason = "Please select a seat option before saving.";
-  } else if (!forklift.powertrain && forklift.chassisrequired) {
-    blockingReason = "Please select a chassis option (Lead or Lithium) before saving.";
-  } else if (forklift.voltagerequired && !forklift.selectedVoltage) {
-    blockingReason = "Please select a battery model (Entry Level, Standard or Heavy Duty) before saving.";
-  }
+  let disabled = false;
 
-  const disabled = !!blockingReason;
+  if (!forklift.selectedSeat && forklift.seatrequired) { disabled = true; }
+  if (!forklift.powertrain && forklift.chassisrequired) { disabled = true; }
+  if (forklift.voltagerequired && !forklift.selectedVoltage) { disabled = true; }
 
   const handleOpen = () => {
     if (!disabled) {
@@ -37,44 +32,10 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
   return (
     <>
       <div>
-        <button
-          className={disabled ? "btn btn-secondary" : "btn btn-primary"}
-          onClick={handleOpen}
-          disabled={disabled}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            opacity: disabled ? 0.6 : 1,
-            cursor: disabled ? "not-allowed" : "pointer",
-            backgroundColor: disabled ? "#e0e0e0" : undefined,
-            color: disabled ? "#9e9e9e" : undefined,
-            borderColor: disabled ? "#e0e0e0" : undefined,
-          }}
-        >
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-          </svg>
+        {/* Using MUI Button so disabled styling (grey) works exactly as before */}
+        <Button onClick={handleOpen} disabled={disabled}>
           Save Quote
-        </button>
-
-        {/* Inline reason message when button is disabled */}
-        {blockingReason && (
-          <p style={{
-            marginTop: "0.5rem",
-            fontSize: "0.8125rem",
-            color: "#c0392b",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "0.375rem",
-            lineHeight: "1.4",
-          }}>
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: "0.125rem" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-            </svg>
-            {blockingReason}
-          </p>
-        )}
+        </Button>
       </div>
 
       {showModal && (
