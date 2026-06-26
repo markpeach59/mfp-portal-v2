@@ -6,7 +6,8 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
 
-  // Determine what (if anything) is blocking the save
+  // Determine what (if anything) is blocking the save.
+  // Only block when the forklift is explicitly flagged as requiring that selection.
   let blockingReason = null;
   if (!forklift.selectedSeat && forklift.seatrequired) {
     blockingReason = "Please select a seat option before saving.";
@@ -38,12 +39,10 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
   return (
     <>
       <div>
-        {/* MUI Button: automatically grey when disabled, same as original */}
         <Button onClick={handleOpen} disabled={disabled}>
           Save Quote
         </Button>
 
-        {/* Red reason message when disabled */}
         {blockingReason && (
           <p style={{
             marginTop: "0.375rem",
@@ -64,7 +63,6 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
 
       {showModal && (
         <>
-          {/* Backdrop */}
           <div
             style={{
               position: "fixed",
@@ -75,7 +73,6 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
             onClick={handleCancel}
           />
 
-          {/* Modal */}
           <div
             style={{
               position: "fixed",
@@ -84,7 +81,7 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
               transform: "translate(-50%, -50%)",
               zIndex: 1001,
               backgroundColor: "#fff",
-              borderRadius: "var(--border-radius-lg, 0.75rem)",
+              borderRadius: "0.75rem",
               boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
               padding: "2rem",
               width: "100%",
@@ -92,41 +89,31 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
             }}
           >
             <div style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.125rem", fontWeight: "600", color: "var(--color-gray-800)", marginBottom: "0.25rem" }}>
+              <h3 style={{ fontSize: "1.125rem", fontWeight: "600", marginBottom: "0.25rem" }}>
                 Save Quote
               </h3>
-              <p style={{ fontSize: "0.875rem", color: "var(--color-gray-500)", margin: 0 }}>
+              <p style={{ fontSize: "0.875rem", color: "#6b7280", margin: 0 }}>
                 Optionally add a title and notes to help identify this quote later.
               </p>
             </div>
 
             <div style={{ marginBottom: "1.25rem" }}>
-              <label
-                htmlFor="quote-title"
-                style={{
-                  display: "block",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  color: "var(--color-gray-700)",
-                  marginBottom: "0.375rem",
-                }}
-              >
-                Title <span style={{ color: "var(--color-gray-400)", fontWeight: "400" }}>(optional)</span>
+              <label htmlFor="quote-title" style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.375rem" }}>
+                Title <span style={{ color: "#9ca3af", fontWeight: "400" }}>(optional)</span>
               </label>
               <input
                 id="quote-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. ABC Ltd – 3 tonne diesel"
+                placeholder="e.g. ABC Ltd - 3 tonne diesel"
                 maxLength={100}
                 style={{
                   width: "100%",
                   padding: "0.625rem 0.75rem",
-                  border: "1px solid var(--color-gray-300, #d1d5db)",
-                  borderRadius: "var(--border-radius, 0.375rem)",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.375rem",
                   fontSize: "0.9375rem",
-                  color: "var(--color-gray-800)",
                   outline: "none",
                   boxSizing: "border-box",
                 }}
@@ -139,17 +126,8 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
             </div>
 
             <div style={{ marginBottom: "1.75rem" }}>
-              <label
-                htmlFor="quote-notes"
-                style={{
-                  display: "block",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  color: "var(--color-gray-700)",
-                  marginBottom: "0.375rem",
-                }}
-              >
-                Notes <span style={{ color: "var(--color-gray-400)", fontWeight: "400" }}>(optional)</span>
+              <label htmlFor="quote-notes" style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", marginBottom: "0.375rem" }}>
+                Notes <span style={{ color: "#9ca3af", fontWeight: "400" }}>(optional)</span>
               </label>
               <textarea
                 id="quote-notes"
@@ -161,10 +139,9 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
                 style={{
                   width: "100%",
                   padding: "0.625rem 0.75rem",
-                  border: "1px solid var(--color-gray-300, #d1d5db)",
-                  borderRadius: "var(--border-radius, 0.375rem)",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.375rem",
                   fontSize: "0.9375rem",
-                  color: "var(--color-gray-800)",
                   outline: "none",
                   resize: "vertical",
                   boxSizing: "border-box",
@@ -189,9 +166,6 @@ const QuoteSave = ({ onQuoteSave, forklift }) => {
                 onClick={handleConfirm}
                 style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: "7rem" }}
               >
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                </svg>
                 Save Quote
               </button>
             </div>
