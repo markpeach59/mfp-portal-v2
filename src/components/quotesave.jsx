@@ -1,4 +1,4 @@
-No - you are allowing a quite to be saved when reuqired elements such as eat import React, { useState } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 
 const QuoteSave = ({ onQuoteSave, forklift }) => {
