@@ -77,9 +77,6 @@ import Viewseats from "./viewseats";
 
 import Viewtyres from "./viewtyres";
 
-import Typography from "@material-ui/core/Typography";
-
-
 import "typeface-roboto";
 
 
@@ -1636,20 +1633,6 @@ return
               
             </ConditionalWrapper>
 
-            {( !this.state.powertrain && this.state.chassisrequired ) ? (
-              <React.Fragment>
-                 <Typography style={{color: 'red'}}>Please select a Chassis Option of lead or Lithium</Typography>
-              </React.Fragment>
-            ) : null}
-            
-
-            
-
-            {( this.state.voltagerequired && !this.state.selectedVoltage ) ? (
-              <React.Fragment>
-                 <Typography style={{color: 'red'}}>Please select Entry Level, Standard or Heavy Duty Battery Model</Typography>
-              </React.Fragment>
-            ) : null}
              
             Capacity : {this.state.liftcapacity}Kg 
           <ConditionalWrapper
@@ -2360,11 +2343,6 @@ return
 
 
 <br />
-            {( !this.state.selectedSeat && this.state.seatrequired ) ? (
-              <React.Fragment>
-                 <Typography style={{color: 'red'}}>Please select a Seat Option</Typography>
-              </React.Fragment>
-            ) : null}
 
 <br /><br />
 
