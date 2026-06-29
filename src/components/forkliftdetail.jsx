@@ -2264,7 +2264,7 @@ return
             ) : null}
             
 
-            {this.state.engType === "Electric" ? (
+            {(this.state.engType === "Electric" && this.state.liftcapacity < 6000 ) ? (
               <React.Fragment>
                 Rear Grab Handle with Horn
                 <br />
@@ -2279,13 +2279,7 @@ return
               </React.Fragment>
             ) : null}
 
-            {(this.state.engType === "Diesel" ) ? (
-              <React.Fragment>
-                
-                
-                <br />
-              </React.Fragment>
-            ) : null}
+            
             {this.state.engType === "LPG" ? (
               <React.Fragment>
                 Rear Grab Handle with Horn
@@ -2293,12 +2287,6 @@ return
               </React.Fragment>
             ) : null}
 
-            {this.state.engType === "LPG" ? (
-              <React.Fragment>
-                
-                <br />
-              </React.Fragment>
-            ) : null}
 
             {this.state.engType !== "Warehouse" ? (
               <React.Fragment>
