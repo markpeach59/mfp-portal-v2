@@ -210,6 +210,7 @@ class ForkliftDetail extends Component {
       defaultbattery:forky.defaultbattery,
       defaultcharger:forky.defaultcharger,
       initialDefaultCharger:forky.defaultcharger,
+      chargernote:forky.chargernote,
 
       optionalbatteries: forky.optionalbatteries,
 
@@ -2654,6 +2655,7 @@ return
                 chargers={this.state.chargers}
                 selectedCharger={this.state.selectedCharger}
                 onChargerSel={this.handleChargerSel}
+                chargernote={this.state.chargernote}
               />
             ) : null}
 

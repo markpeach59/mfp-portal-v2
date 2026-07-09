@@ -9,7 +9,7 @@ import FormLabel from "@material-ui/core/FormLabel";
 import Divider from "@material-ui/core/Divider";
 
 const Chargers = props => {
-  const { chargers, onChargerSel, selectedCharger } = props;
+  const { chargers, onChargerSel, selectedCharger, chargernote } = props;
 
   var aa = "";
   if (selectedCharger) {
@@ -20,6 +20,18 @@ const Chargers = props => {
     <React.Fragment>
       <FormControl component="fieldset">
         <FormLabel component="legend">Chargers</FormLabel>
+
+        {chargernote && (
+          <p style={{
+            fontSize: '0.75rem',
+            color: '#666',
+            fontStyle: 'italic',
+            margin: '2px 0 6px 0',
+            lineHeight: '1.3'
+          }}>
+            {chargernote}
+          </p>
+        )}
 
         <RadioGroup aria-label="chargers" name="chargers" row={true}>
           {chargers.map(charger => (
