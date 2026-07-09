@@ -209,6 +209,7 @@ class ForkliftDetail extends Component {
 
       defaultbattery:forky.defaultbattery,
       defaultcharger:forky.defaultcharger,
+      initialDefaultCharger:forky.defaultcharger,
 
       optionalbatteries: forky.optionalbatteries,
 
@@ -2258,7 +2259,7 @@ return
                 <br />
                 Amber Beacon
                 <br />
-                Reverse Alarm
+                Re Alarm
                 <br />
               </React.Fragment>
             ) : null}
@@ -2309,7 +2310,7 @@ return
 
 
 <ConditionalWrapper
-              condition={this.state.defaultcharger}
+              condition={this.state.defaultcharger && !this.state.selectedCharger}
               wrapper={(children) => (
                 <React.Fragment>
                   {children}
@@ -2317,7 +2318,7 @@ return
                 </React.Fragment>
               )}
             >
-              {this.state.defaultcharger ? this.state.defaultcharger + " Charger": null}
+              {(this.state.defaultcharger && !this.state.selectedCharger) ? this.state.defaultcharger + " Charger": null}
             </ConditionalWrapper>
             <br />
             
