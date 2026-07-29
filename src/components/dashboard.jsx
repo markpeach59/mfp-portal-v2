@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
+import { MARKETING_CATEGORIES } from "../config/marketingCategories";
 
 class Dashboard extends Component {
   state = {
@@ -66,7 +67,7 @@ class Dashboard extends Component {
           </svg>
         ),
         to: "/marketing",
-        badge: "6 Categories",
+        badge: `${MARKETING_CATEGORIES.length} Categories`,
         badgeClass: "badge-info"
       },
       {
