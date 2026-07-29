@@ -3,22 +3,34 @@ import config from "../config.json";
 
 const apiEndpoint = config.apiURL + "/files";
 
-// List files by category and optional subcategory
-export function listFiles(category, subcategory = null) {
+// List files by category and optional subcategory tiers
+export function listFiles(category, subcategory = null, subcategory2 = null, subcategory3 = null) {
   let url = `${apiEndpoint}?category=${category}`;
   if (subcategory) {
     url += `&subcategory=${subcategory}`;
+  }
+  if (subcategory2) {
+    url += `&subcategory2=${subcategory2}`;
+  }
+  if (subcategory3) {
+    url += `&subcategory3=${subcategory3}`;
   }
   return http.get(url);
 }
 
 // Upload file (admin only)
-export function uploadFile(file, category, subcategory = null, description = '') {
+export function uploadFile(file, category, subcategory = null, subcategory2 = null, subcategory3 = null, description = '') {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('category', category);
   if (subcategory) {
     formData.append('subcategory', subcategory);
+  }
+  if (subcategory2) {
+    formData.append('subcategory2', subcategory2);
+  }
+  if (subcategory3) {
+    formData.append('subcategory3', subcategory3);
   }
   if (description) {
     formData.append('description', description);

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
+import { MARKETING_CATEGORIES } from "../config/marketingCategories";
 
 class Marketing extends Component {
   state = {
@@ -23,19 +24,10 @@ class Marketing extends Component {
 
   render() {
     const { user } = this.state;
-    
+
     if (!user) return <p>Loading...</p>;
 
     const isAdmin = user.isAdmin;
-
-    const categories = [
-      { name: "Brochures", count: 12 },
-      { name: "Social Media", count: 24 },
-      { name: "Banners", count: 8 },
-      { name: "Product Photos", count: 45 },
-      { name: "Logos", count: 6 },
-      { name: "Spec Sheets", count: 18 }
-    ];
 
     return (
       <div className="page-container">
@@ -81,31 +73,46 @@ class Marketing extends Component {
             <p className="page-subtitle">Access brochures, product photos and promotional materials</p>
           </div>
 
-          <div className="grid-3">
-            {categories.map((category, index) => (
-              <div key={index} className="card">
-                <div style={{ width: '100%', height: '150px', backgroundColor: 'var(--color-gray-100)', borderRadius: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="48" height="48" fill="none" stroke="var(--color-gray-400)" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+            {MARKETING_CATEGORIES.map((category) => (
+              <Link
+                key={category.id}
+                to="/marketing-gallery"
+                className="card"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {/* Icon */}
+                <div style={{ width: '48px', height: '48px', backgroundColor: 'var(--color-gray-100)', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {category.children ? (
+                    <svg width="24" height="24" fill="none" stroke="var(--color-gray-400)" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                    </svg>
+                  ) : (
+                    <svg width="24" height="24" fill="none" stroke="var(--color-gray-400)" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  )}
                 </div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0' }}>
-                  {category.name}
-                </h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', marginBottom: '1rem' }}>
-                  {category.count} images
-                </p>
-                <button className="btn btn-secondary" style={{ width: '100%' }} disabled>
-                  View Category
-                </button>
-              </div>
-            ))}
-          </div>
 
-          <div className="card mt-xl">
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', margin: 0, textAlign: 'center' }}>
-              <strong>Note:</strong> Backend API integration required. This feature will be available once the file portal API is implemented.
-            </p>
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--color-gray-800)', margin: '0 0 0.25rem 0', lineHeight: '1.4' }}>
+                    {category.label}
+                  </h3>
+                  {category.children && (
+                    <p style={{ fontSize: '0.8125rem', color: 'var(--color-gray-500)', margin: 0 }}>
+                      {category.children.length} {category.children.length === 1 ? 'subcategory' : 'subcategories'}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
           </div>
         </main>
 

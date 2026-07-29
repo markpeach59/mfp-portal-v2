@@ -27,12 +27,12 @@ const CATEGORY_CONFIG = {
 };
 
 // Wrapper component to use react-dropzone hook with class component
-function DropzoneWrapper({ onDrop, config, uploading, children }) {
+function DropzoneWrapper({ onDrop, config, uploading, disabled, children }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: config.accept,
     maxFiles: config.maxFiles,
-    disabled: uploading
+    disabled: uploading || disabled
   });
   
   return children({ getRootProps, getInputProps, isDragActive });
@@ -46,7 +46,7 @@ class FileUploader extends Component {
   };
   
   handleDrop = async (acceptedFiles) => {
-    const { category, subcategory, onUploadComplete } = this.props;
+    const { category, subcategory, subcategory2, subcategory3, onUploadComplete } = this.props;
     
     this.setState({ error: null, uploading: true, progress: 0 });
     
@@ -57,7 +57,9 @@ class FileUploader extends Component {
         const response = await fileApi.uploadFile(
           acceptedFiles[i], 
           category, 
-          subcategory
+          subcategory || null,
+          subcategory2 || null,
+          subcategory3 || null
         );
         results.push(response.data.file);
         this.setState({ progress: Math.round(((i + 1) / acceptedFiles.length) * 100) });
@@ -89,12 +91,16 @@ class FileUploader extends Component {
       return <div>Invalid category</div>;
     }
     
+    const { disabled } = this.props;
+    const isDisabled = uploading || !!disabled;
+
     return (
       <div>
         <DropzoneWrapper 
           onDrop={this.handleDrop} 
           config={config} 
           uploading={uploading}
+          disabled={!!disabled}
         >
           {({ getRootProps, getInputProps, isDragActive }) => (
             <div
@@ -104,8 +110,9 @@ class FileUploader extends Component {
                 borderRadius: '12px',
                 padding: '32px',
                 textAlign: 'center',
-                cursor: uploading ? 'not-allowed' : 'pointer',
-                backgroundColor: isDragActive ? '#FEF2F2' : '#F9FAFB',
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
+                backgroundColor: isDisabled ? '#F3F4F6' : isDragActive ? '#FEF2F2' : '#F9FAFB',
+                opacity: isDisabled ? 0.6 : 1,
                 transition: 'all 0.2s'
               }}
             >
