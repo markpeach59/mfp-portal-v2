@@ -51,12 +51,15 @@ class MarketingGallery extends Component {
   };
 
   // Map breadcrumb ids to subcategory params
+  // breadcrumb can be up to 4 levels deep:
+  //   [0] subcategory, [1] subcategory2, [2] subcategory3 -OR- [3] subcategory3
+  // When 4 levels deep, breadcrumb[3] is the leaf and maps to subcategory3
   getSubcategoryParams = () => {
     const { breadcrumb } = this.state;
     return {
       subcategory:  breadcrumb[0] || null,
       subcategory2: breadcrumb[1] || null,
-      subcategory3: breadcrumb[2] || null
+      subcategory3: breadcrumb[3] || breadcrumb[2] || null
     };
   };
 
