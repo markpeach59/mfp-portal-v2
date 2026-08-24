@@ -32,6 +32,7 @@ import Rollers from "./rollers";
 import Pincode from "./pincode";
 import Keypad from "./keypad";
 import Displaywithcamera from "./displaywithcamera";
+import Wirelesscamerasystem from "./wirelesscamerasystem";
 import Liftybutton from "./liftybutton";
 import Stabiliser from "./stabiliser";
 
@@ -188,6 +189,7 @@ class ForkliftDetail extends Component {
       defaultroller:forky.defaultroller,
       rollers:forky.rollers,
       displaywithcameras:forky.displaywithcamera,
+      wirelesscamerasystems:forky.wirelesscamerasystem,
       liftybuttons:forky.liftybutton,
       
       tiltfunctions: forky.tiltfunction,
@@ -393,6 +395,7 @@ class ForkliftDetail extends Component {
       selectedKeypad: undefined,
       selectedRoller: undefined,
       selectedDisplaywithcamera: undefined,
+      selectedWirelesscamerasystem: undefined,
       selectedLiftybutton: undefined,
       selectedTiltfunction: undefined,
 
@@ -603,6 +606,7 @@ class ForkliftDetail extends Component {
     if (this.state.selectedStabiliser ) quote.stabiliser = true;
 
     if (this.state.selectedDisplaywithcamera) quote.displaywithcamera = true;
+    if (this.state.selectedWirelesscamerasystem) quote.wirelesscamerasystem = true;
     if (this.state.selectedLiftybutton) quote.liftybutton = true;
     if (this.state.selectedPincode) quote.pincode = this.state.selectedPincode.pincodetype;
     if (this.state.selectedKeypad) quote.keypad = true;
@@ -1145,6 +1149,15 @@ return
     const newprice = this.state.totalprice + halolight.price - oldprice;
 
     this.updateStateWithDiscount({ selectedHalolight: halolight }, newprice, { selectedHalolight: halolight });
+  };
+
+  handleWirelesscamerasystemSel = (wirelesscamerasystem) => {
+    const oldprice = this.state.selectedWirelesscamerasystem
+      ? this.state.selectedWirelesscamerasystem.price
+      : 0;
+    const newprice = this.state.totalprice + wirelesscamerasystem.price - oldprice;
+
+    this.updateStateWithDiscount({ selectedWirelesscamerasystem: wirelesscamerasystem }, newprice, { selectedWirelesscamerasystem: wirelesscamerasystem });
   };
 
   handleUpsweptexhaustSel = (upsweptexhaust) => {
@@ -1868,6 +1881,17 @@ return
               {this.state.selectedDisplaywithcamera ? "Display with camera" : null}
             </ConditionalWrapper>
 
+            <ConditionalWrapper
+              condition={this.state.selectedWirelesscamerasystem}
+              wrapper={(children) => (
+                <React.Fragment>
+                  {children}
+                  <br />
+                </React.Fragment>
+              )}
+            >
+              {this.state.selectedWirelesscamerasystem ? "Wireless Camera System" : null}
+            </ConditionalWrapper>
 
             <ConditionalWrapper
               condition={this.state.selectedPincode}
@@ -2486,6 +2510,14 @@ return
                 halolights={this.state.halolights}
                 selectedHalolight={this.state.selectedHalolight}
                 onHalolightSel={this.handleHalolight}
+              />
+            ) : null}
+
+            {this.state.wirelesscamerasystems && this.state.wirelesscamerasystems.length > 0 ? (
+              <Wirelesscamerasystem
+                wirelesscamerasystems={this.state.wirelesscamerasystems}
+                selectedWirelesscamerasystem={this.state.selectedWirelesscamerasystem}
+                onWirelesscamerasystemSel={this.handleWirelesscamerasystemSel}
               />
             ) : null}   
 

@@ -56,6 +56,7 @@ class QuoteDetail extends Component {
       forkpositioner: forky.forkpositioner,
       pincode: forky.pincode,
       displaywithcamera: forky.displaywithcamera,
+      wirelesscamerasystem: forky.wirelesscamerasystem,
       liftybutton: forky.liftybutton,
       roller: forky.roller,
       controller: forky.controller,
@@ -465,6 +466,10 @@ class QuoteDetail extends Component {
 
               <ConditionalWrapper condition={this.state.displaywithcamera} wrapper={(children) => <>{children}</>}>
                 {"Display with Camera, "}
+              </ConditionalWrapper>
+
+              <ConditionalWrapper condition={this.state.wirelesscamerasystem} wrapper={(children) => <>{children}</>}>
+                {"Wireless Camera System, "}
               </ConditionalWrapper>
 
               <ConditionalWrapper condition={this.state.liftybutton} wrapper={(children) => <>{children}</>}>
