@@ -33,6 +33,7 @@ import Pincode from "./pincode";
 import Keypad from "./keypad";
 import Displaywithcamera from "./displaywithcamera";
 import Wirelesscamerasystem from "./wirelesscamerasystem";
+import Frontledheadlight from "./frontledheadlight";
 import Liftybutton from "./liftybutton";
 import Stabiliser from "./stabiliser";
 
@@ -190,6 +191,7 @@ class ForkliftDetail extends Component {
       rollers:forky.rollers,
       displaywithcameras:forky.displaywithcamera,
       wirelesscamerasystems:forky.wirelesscamerasystem,
+      frontledheadlights:forky.frontledheadlight,
       liftybuttons:forky.liftybutton,
       
       tiltfunctions: forky.tiltfunction,
@@ -396,6 +398,7 @@ class ForkliftDetail extends Component {
       selectedRoller: undefined,
       selectedDisplaywithcamera: undefined,
       selectedWirelesscamerasystem: undefined,
+      selectedFrontledheadlight: undefined,
       selectedLiftybutton: undefined,
       selectedTiltfunction: undefined,
 
@@ -607,6 +610,7 @@ class ForkliftDetail extends Component {
 
     if (this.state.selectedDisplaywithcamera) quote.displaywithcamera = true;
     if (this.state.selectedWirelesscamerasystem) quote.wirelesscamerasystem = true;
+    if (this.state.selectedFrontledheadlight) quote.frontledheadlight = true;
     if (this.state.selectedLiftybutton) quote.liftybutton = true;
     if (this.state.selectedPincode) quote.pincode = this.state.selectedPincode.pincodetype;
     if (this.state.selectedKeypad) quote.keypad = true;
@@ -1158,6 +1162,15 @@ return
     const newprice = this.state.totalprice + wirelesscamerasystem.price - oldprice;
 
     this.updateStateWithDiscount({ selectedWirelesscamerasystem: wirelesscamerasystem }, newprice, { selectedWirelesscamerasystem: wirelesscamerasystem });
+  };
+
+  handleFrontledheadlightSel = (frontledheadlight) => {
+    const oldprice = this.state.selectedFrontledheadlight
+      ? this.state.selectedFrontledheadlight.price
+      : 0;
+    const newprice = this.state.totalprice + frontledheadlight.price - oldprice;
+
+    this.updateStateWithDiscount({ selectedFrontledheadlight: frontledheadlight }, newprice, { selectedFrontledheadlight: frontledheadlight });
   };
 
   handleUpsweptexhaustSel = (upsweptexhaust) => {
@@ -1894,6 +1907,18 @@ return
             </ConditionalWrapper>
 
             <ConditionalWrapper
+              condition={this.state.selectedFrontledheadlight}
+              wrapper={(children) => (
+                <React.Fragment>
+                  {children}
+                  <br />
+                </React.Fragment>
+              )}
+            >
+              {this.state.selectedFrontledheadlight ? "Front LED Headlight" : null}
+            </ConditionalWrapper>
+
+            <ConditionalWrapper
               condition={this.state.selectedPincode}
               wrapper={(children) => (
                 <React.Fragment>
@@ -2518,6 +2543,14 @@ return
                 wirelesscamerasystems={this.state.wirelesscamerasystems}
                 selectedWirelesscamerasystem={this.state.selectedWirelesscamerasystem}
                 onWirelesscamerasystemSel={this.handleWirelesscamerasystemSel}
+              />
+            ) : null}
+
+            {this.state.frontledheadlights && this.state.frontledheadlights.length > 0 ? (
+              <Frontledheadlight
+                frontledheadlights={this.state.frontledheadlights}
+                selectedFrontledheadlight={this.state.selectedFrontledheadlight}
+                onFrontledheadlightSel={this.handleFrontledheadlightSel}
               />
             ) : null}   
 

@@ -57,6 +57,7 @@ class QuoteDetail extends Component {
       pincode: forky.pincode,
       displaywithcamera: forky.displaywithcamera,
       wirelesscamerasystem: forky.wirelesscamerasystem,
+      frontledheadlight: forky.frontledheadlight,
       liftybutton: forky.liftybutton,
       roller: forky.roller,
       controller: forky.controller,
@@ -470,6 +471,10 @@ class QuoteDetail extends Component {
 
               <ConditionalWrapper condition={this.state.wirelesscamerasystem} wrapper={(children) => <>{children}</>}>
                 {"Wireless Camera System, "}
+              </ConditionalWrapper>
+
+              <ConditionalWrapper condition={this.state.frontledheadlight} wrapper={(children) => <>{children}</>}>
+                {"Front LED Headlight, "}
               </ConditionalWrapper>
 
               <ConditionalWrapper condition={this.state.liftybutton} wrapper={(children) => <>{children}</>}>
