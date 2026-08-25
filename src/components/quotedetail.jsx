@@ -58,6 +58,7 @@ class QuoteDetail extends Component {
       displaywithcamera: forky.displaywithcamera,
       wirelesscamerasystem: forky.wirelesscamerasystem,
       frontledheadlight: forky.frontledheadlight,
+      rearledheadlight: forky.rearledheadlight,
       liftybutton: forky.liftybutton,
       roller: forky.roller,
       controller: forky.controller,
@@ -475,6 +476,10 @@ class QuoteDetail extends Component {
 
               <ConditionalWrapper condition={this.state.frontledheadlight} wrapper={(children) => <>{children}</>}>
                 {"Front LED Headlight, "}
+              </ConditionalWrapper>
+
+              <ConditionalWrapper condition={this.state.rearledheadlight} wrapper={(children) => <>{children}</>}>
+                {"Rear LED Headlight, "}
               </ConditionalWrapper>
 
               <ConditionalWrapper condition={this.state.liftybutton} wrapper={(children) => <>{children}</>}>

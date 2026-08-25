@@ -34,6 +34,7 @@ import Keypad from "./keypad";
 import Displaywithcamera from "./displaywithcamera";
 import Wirelesscamerasystem from "./wirelesscamerasystem";
 import Frontledheadlight from "./frontledheadlight";
+import Rearledheadlight from "./rearledheadlight";
 import Liftybutton from "./liftybutton";
 import Stabiliser from "./stabiliser";
 
@@ -192,6 +193,7 @@ class ForkliftDetail extends Component {
       displaywithcameras:forky.displaywithcamera,
       wirelesscamerasystems:forky.wirelesscamerasystem,
       frontledheadlights:forky.frontledheadlight,
+      rearledheadlights:forky.rearledheadlight,
       liftybuttons:forky.liftybutton,
       
       tiltfunctions: forky.tiltfunction,
@@ -399,6 +401,7 @@ class ForkliftDetail extends Component {
       selectedDisplaywithcamera: undefined,
       selectedWirelesscamerasystem: undefined,
       selectedFrontledheadlight: undefined,
+      selectedRearledheadlight: undefined,
       selectedLiftybutton: undefined,
       selectedTiltfunction: undefined,
 
@@ -611,6 +614,7 @@ class ForkliftDetail extends Component {
     if (this.state.selectedDisplaywithcamera) quote.displaywithcamera = true;
     if (this.state.selectedWirelesscamerasystem) quote.wirelesscamerasystem = true;
     if (this.state.selectedFrontledheadlight) quote.frontledheadlight = true;
+    if (this.state.selectedRearledheadlight) quote.rearledheadlight = true;
     if (this.state.selectedLiftybutton) quote.liftybutton = true;
     if (this.state.selectedPincode) quote.pincode = this.state.selectedPincode.pincodetype;
     if (this.state.selectedKeypad) quote.keypad = true;
@@ -1171,6 +1175,15 @@ return
     const newprice = this.state.totalprice + frontledheadlight.price - oldprice;
 
     this.updateStateWithDiscount({ selectedFrontledheadlight: frontledheadlight }, newprice, { selectedFrontledheadlight: frontledheadlight });
+  };
+
+  handleRearledheadlightSel = (rearledheadlight) => {
+    const oldprice = this.state.selectedRearledheadlight
+      ? this.state.selectedRearledheadlight.price
+      : 0;
+    const newprice = this.state.totalprice + rearledheadlight.price - oldprice;
+
+    this.updateStateWithDiscount({ selectedRearledheadlight: rearledheadlight }, newprice, { selectedRearledheadlight: rearledheadlight });
   };
 
   handleUpsweptexhaustSel = (upsweptexhaust) => {
@@ -1919,6 +1932,18 @@ return
             </ConditionalWrapper>
 
             <ConditionalWrapper
+              condition={this.state.selectedRearledheadlight}
+              wrapper={(children) => (
+                <React.Fragment>
+                  {children}
+                  <br />
+                </React.Fragment>
+              )}
+            >
+              {this.state.selectedRearledheadlight ? "Rear LED Headlight" : null}
+            </ConditionalWrapper>
+
+            <ConditionalWrapper
               condition={this.state.selectedPincode}
               wrapper={(children) => (
                 <React.Fragment>
@@ -2551,6 +2576,14 @@ return
                 frontledheadlights={this.state.frontledheadlights}
                 selectedFrontledheadlight={this.state.selectedFrontledheadlight}
                 onFrontledheadlightSel={this.handleFrontledheadlightSel}
+              />
+            ) : null}
+
+            {this.state.rearledheadlights && this.state.rearledheadlights.length > 0 ? (
+              <Rearledheadlight
+                rearledheadlights={this.state.rearledheadlights}
+                selectedRearledheadlight={this.state.selectedRearledheadlight}
+                onRearledheadlightSel={this.handleRearledheadlightSel}
               />
             ) : null}   
 
