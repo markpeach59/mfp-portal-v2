@@ -48,6 +48,7 @@ class QuoteDetail extends Component {
       imgName: forky.imgname,
       masttype: forky.masttype,
       mastsize: forky.mastsize,
+      mastpoa: forky.mastpoa,
       closedheight: forky.closedheight,
       freeliftheight: forky.freeliftheight,
       forks: forky.forks,
@@ -633,6 +634,7 @@ class QuoteDetail extends Component {
             <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'var(--color-gray-50)', borderRadius: 'var(--border-radius-lg)' }}>
               <p style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--color-gray-800)', marginBottom: '1rem' }}>
                 Quote Full Price: £{(this.state.price + parseInt(this.state.markup)).toLocaleString()}
+                {this.state.mastpoa ? " + POA for Mast" : null}
               </p>
 
               {this.state.hasDiscount ? (

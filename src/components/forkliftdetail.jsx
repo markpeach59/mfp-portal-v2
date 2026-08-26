@@ -356,6 +356,7 @@ class ForkliftDetail extends Component {
       selectedEngine: undefined,
       selectedMast: undefined,
       selectedMastSize: undefined,
+      mastIsPOA: false,
       selectedValve: undefined,
       selectedFork: undefined,
       selectedSideShift: undefined,
@@ -534,8 +535,9 @@ class ForkliftDetail extends Component {
       quote.mastsize = this.state.selectedMastSize.mastlength;
       quote.closedheight = this.state.selectedMastSize.closedheight;
       quote.freeliftheight = this.state.selectedMastSize.freeliftheight;
-
     }
+
+    if (this.state.mastIsPOA) quote.mastpoa = true;
 
     if (this.state.selectedValve)
       quote.valve = this.state.selectedValve.valvetype;
@@ -801,14 +803,20 @@ console.log("Model", this.state.model, "->",voltage.model);
   };
 
   handleMastSizeSel = (mastsize, masttype) => {
-    const oldprice = this.state.selectedMastSize
-      ? this.state.selectedMastSize.price
-      : 0;
-    const newprice = this.state.totalprice + mastsize.price - oldprice;
+    const isPOA = mastsize.price === undefined || mastsize.price === null;
+    const mastprice = isPOA ? 0 : mastsize.price;
+
+    const prevIsPOA = this.state.selectedMastSize
+      ? (this.state.selectedMastSize.price === undefined || this.state.selectedMastSize.price === null)
+      : false;
+    const oldprice = prevIsPOA ? 0 : (this.state.selectedMastSize ? this.state.selectedMastSize.price : 0);
+
+    const newprice = this.state.totalprice + mastprice - oldprice;
 
     this.updateStateWithDiscount({
       selectedMastSize: mastsize,
       selectedMast: masttype,
+      mastIsPOA: isPOA,
     }, newprice, {
       selectedMastSize: mastsize,
       selectedMast: masttype,
@@ -2439,6 +2447,7 @@ return
             <strong>
               Quote Price : £
               {this.state.totalprice + parseInt(this.state.markup)}
+              {this.state.mastIsPOA ? " + POA for Mast" : null}
             </strong>
 ):null}
 

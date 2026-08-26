@@ -26,23 +26,25 @@ const Masts = props => {
     //console.log("AYA", aa);
   }
 
-  function displayMastDetails (mastsize) {return mastsize.freeliftheight ? (
-                          
-                              mastsize.mastlength +
-                              "mm,  " +
-                              mastsize.closedheight +
-                              "mm," +
-                              mastsize.freeliftheight +
-                              "mm"
-                            
-                        ): (
-                          
-                              mastsize.mastlength +
-                              "mm,  " +
-                              mastsize.closedheight +
-                              "mm"
-                            
-                        )
+  function displayMastDetails (mastsize) {
+    const poa = mastsize.price === undefined || mastsize.price === null;
+    const poaLabel = poa ? " - POA" : "";
+
+    return mastsize.freeliftheight ? (
+      mastsize.mastlength +
+      "mm,  " +
+      mastsize.closedheight +
+      "mm," +
+      mastsize.freeliftheight +
+      "mm" +
+      poaLabel
+    ) : (
+      mastsize.mastlength +
+      "mm,  " +
+      mastsize.closedheight +
+      "mm" +
+      poaLabel
+    );
   }
 
   function displayCapacityMFH (mastsize, selectedSideShift, selectedForkpositioner ) {
