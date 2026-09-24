@@ -1,11 +1,12 @@
 import React from "react";
+import { brandConfig } from "../config/brand";
 
 const ForkliftImg = props => {
   const { imgName } = props;
 
   //console.log("IMG:", imgName);
 
-  const imgNam = "https://maximalforklifts.s3.eu-west-2.amazonaws.com/" + imgName;
+  const imgNam = brandConfig.imageBaseUrl + imgName;
 
   //console.log("IMG:", imgNam);
 

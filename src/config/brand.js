@@ -12,4 +12,7 @@ export const brandConfig = {
   mainSiteLabel: isSAMUK ? 'samuk.com' : 'maximalforklift.co.uk',
   footerText: isSAMUK ? 'SAMUK' : 'Maximal UK - Dealer Portal',
   copyrightYear: new Date().getFullYear(),
+  imageBaseUrl: isSAMUK
+    ? 'https://samukforklifts.s3.eu-west-2.amazonaws.com/'
+    : 'https://maximalforklifts.s3.eu-west-2.amazonaws.com/',
 };
