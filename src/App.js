@@ -6,9 +6,14 @@ import ProtectedAdminRoute from "./components/protectedadminroute";
 // Import portal CSS
 import "./styles/portal.css";
 
+// Brand config
+import { isSAMUK } from "./config/brand";
+
 // New components
 import Dashboard from "./components/dashboard";
 import ConfiguratorLayout from "./components/configuratorlayout";
+
+// Maximal-only components (not used in SAMUK build)
 import StockListNew from "./components/stocklist";
 import MarketingGalleryNew from "./components/MarketingGallery";
 import OffersGridNew from "./components/OffersGrid";
@@ -53,10 +58,10 @@ class App extends Component {
         {/* Configurator section with sub-routes */}
         <ProtectedRoute path="/configurator" component={ConfiguratorLayout} />
 
-        {/* Stock, Marketing, Offers */}
-        <ProtectedRoute path="/stock" component={StockListNew} />
-        <ProtectedRoute path="/marketing" component={MarketingGalleryNew} />
-        <ProtectedRoute path="/offers" component={OffersGridNew} />
+        {/* Stock, Marketing, Offers — Maximal only */}
+        {!isSAMUK && <ProtectedRoute path="/stock" component={StockListNew} />}
+        {!isSAMUK && <ProtectedRoute path="/marketing" component={MarketingGalleryNew} />}
+        {!isSAMUK && <ProtectedRoute path="/offers" component={OffersGridNew} />}
 
         {/* Forklift detail page */}
         <ProtectedRoute exact path="/forkliftdetail/:modelName" component={ForkliftDetail} />
@@ -72,7 +77,7 @@ class App extends Component {
         <ProtectedAdminRoute path="/admin/dealers" component={ListAllDealers} />
         <ProtectedAdminRoute path="/admin/register-user" component={RegistrationForm} />
         <ProtectedAdminRoute path="/admin/register-dealer" component={DealerRegistrationForm} />
-        <ProtectedAdminRoute path="/admin/files" component={AdminFileManager} />
+        {!isSAMUK && <ProtectedAdminRoute path="/admin/files" component={AdminFileManager} />}
 
         {/* Legacy redirects for backward compatibility */}
         <Redirect from="/forklifts" to="/configurator/build" />

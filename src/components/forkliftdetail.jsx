@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import { getDealerDetail } from "../services/dealerService";
+import { isSAMUK } from "../config/brand";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -96,28 +97,24 @@ class ForkliftDetail extends Component {
 
     let restricted = false;
 
-    if (user.dealerId){
-      const { data: dealery } = await getDealerDetail(user.dealerId);
+    if (!isSAMUK) {
+      if (user.dealerId){
+        const { data: dealery } = await getDealerDetail(user.dealerId);
 
-      //console.log("Dealer ", dealery);
-      //getting this here as Filter values are set local in the code and not on MongoDB
-      if (dealery.isRestricted) {
-        restricted = true;
-        console.log('User is restricted');
-
+        //console.log("Dealer ", dealery);
+        if (dealery.isRestricted) {
+          restricted = true;
+          console.log('User is restricted');
+        }
       }
-    }
 
-    if (user.isMaximGB || user.isAdmin){
-     
-      const test = localStorage.getItem("restricted");
-      if (test){
-        restricted = true;
-        //console.log('User is restricted');
-        this.setState({ restricted });
-    } else {
-      //console.log("User is not restricted")
-    }
+      if (user.isMaximGB || user.isAdmin){
+        const test = localStorage.getItem("restricted");
+        if (test){
+          restricted = true;
+          this.setState({ restricted });
+        }
+      }
     }
     //console.log('User is restricted');
 
@@ -127,10 +124,10 @@ class ForkliftDetail extends Component {
     //console.log("Detail", forky);
 
     let initialbaseprice = forky.basePrice;
-    if (restricted && forky.basePriceR ) initialbaseprice = forky.basePriceR;
+    if (!isSAMUK && restricted && forky.basePriceR ) initialbaseprice = forky.basePriceR;
 
     let initialChassis = forky.chassis;
-    if (restricted && forky.chassisR ) initialChassis = forky.chassisR;
+    if (!isSAMUK && restricted && forky.chassisR ) initialChassis = forky.chassisR;
 
     //let initialVoltage = forky.voltage;
     //console.log( 'Forky voltage', forky.voltage)
@@ -650,7 +647,7 @@ class ForkliftDetail extends Component {
     // Calculate old price adjustment
     let oldPriceAdjustment = 0;
     if (this.state.selectedEngine) {
-      if (this.state.restricted && this.state.selectedEngine.basepriceR !== undefined) {
+      if (!isSAMUK && this.state.restricted && this.state.selectedEngine.basepriceR !== undefined) {
         // Calculate equivalent price adjustment from absolute basepriceR
         oldPriceAdjustment = this.state.selectedEngine.basepriceR - this.state.baseprice;
       } else {
@@ -661,7 +658,7 @@ class ForkliftDetail extends Component {
 
     // Calculate new price adjustment
     let newPriceAdjustment;
-    if (this.state.restricted && engine.basepriceR !== undefined) {
+    if (!isSAMUK && this.state.restricted && engine.basepriceR !== undefined) {
       // Calculate equivalent price adjustment from absolute basepriceR
       // basepriceR is the total base price (e.g. 12980), so we calculate the difference
       newPriceAdjustment = engine.basepriceR - this.state.baseprice;
@@ -712,13 +709,14 @@ class ForkliftDetail extends Component {
 
     let newbaseprice = voltage.price;
 
-    console.log('Restricted', this.state.restricted);
+    if (!isSAMUK) {
+      console.log('Restricted', this.state.restricted);
+      if (this.state.restricted ) {
+        if (this.state.selectedVoltage) 
+          baseprice = this.state.selectedVoltage.priceR;
 
-    if (this.state.restricted ) {
-      if (this.state.selectedVoltage) 
-        baseprice = this.state.selectedVoltage.priceR;
-
-      newbaseprice = voltage.priceR;
+        newbaseprice = voltage.priceR;
+      }
     }
 
     console.log( 'Prices ', newbaseprice,' ', baseprice);
@@ -760,13 +758,14 @@ console.log("Model", this.state.model, "->",voltage.model);
   
       let newbaseprice = chassis.price;
       
-      console.log('Restricted', this.state.restricted);
-  
-      if (this.state.restricted ) {
-        if (this.state.selectedChassis) 
-          baseprice = this.state.selectedChassis.priceR;
-  
-        newbaseprice = chassis.priceR;
+      if (!isSAMUK) {
+        console.log('Restricted', this.state.restricted);
+        if (this.state.restricted ) {
+          if (this.state.selectedChassis) 
+            baseprice = this.state.selectedChassis.priceR;
+    
+          newbaseprice = chassis.priceR;
+        }
       }
   
       console.log( 'Prices ', newbaseprice,' ', baseprice);
@@ -1663,11 +1662,11 @@ return
 <Grid>
         
 
-                  {this.state.user && (this.state.user.isAdmin || this.state.user.isMaximGB) && 
+                  {!isSAMUK && this.state.user && (this.state.user.isAdmin || this.state.user.isMaximGB) && 
                   (!this.state.restricted) && (
                     "Normal Pricing"
                   )} 
-                  {this.state.user && (this.state.user.isAdmin || this.state.user.isMaximGB) && 
+                  {!isSAMUK && this.state.user && (this.state.user.isAdmin || this.state.user.isMaximGB) && 
                   (this.state.restricted) && (
                     "Restricted Pricing"
                   )}     
@@ -2459,6 +2458,16 @@ return
                 discountAmount={this.state.discountAmount}
                 discountPercentage={this.state.discountPercentage}
               />
+            ) : null}
+
+            {isSAMUK && !(this.state.voltagerequired && !this.state.selectedVoltage) && !(this.state.chassisrequired && !this.state.selectedChassis) ? (
+              <React.Fragment>
+                <br /><strong>
+                  30 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.totalprice) * 1.005) + parseInt(this.state.markup)}
+                  <br />60 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.totalprice) * 1.01) + parseInt(this.state.markup)}
+                  <br />90 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.totalprice) * 1.015) + parseInt(this.state.markup)}
+                </strong>
+              </React.Fragment>
             ) : null}
 
             <QuoteSave onQuoteSave={this.handleQuoteSave} forklift={this.state}/>

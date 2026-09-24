@@ -1,6 +1,6 @@
 import jwtDecode from "jwt-decode";
 import http from "./httpService";
-import config from "../config.json";
+import config from "../config/apiConfig";
 
 const apiEndPoint = config.apiURL + "/auth";
 

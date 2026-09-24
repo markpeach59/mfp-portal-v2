@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import ForkliftImg from "./forkliftimg";
+import { isSAMUK, brandConfig } from "../config/brand";
 import {
   getQuoteDetail,
   createOrderFromQuote,
@@ -186,7 +187,7 @@ class QuoteDetail extends Component {
             <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
           </div>
           <nav className="header-nav">
-            <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+            <a href={brandConfig.mainSiteUrl} className="header-link" target="_blank" rel="noopener noreferrer">
               Main Site
             </a>
             <div className="header-user">
@@ -661,10 +662,20 @@ class QuoteDetail extends Component {
                 </div>
               ) : null}
 
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', marginTop: '1rem' }}>
-                <strong>Or on a 5 year contract Hire at £ per week<br />
-                3 year lease purchase at £ per week</strong>
-              </p>
+              {isSAMUK ? (
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', marginTop: '1rem' }}>
+                  <strong>
+                    30 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.price) * 1.005) + parseInt(this.state.markup)}<br />
+                    60 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.price) * 1.01) + parseInt(this.state.markup)}<br />
+                    90 Day terms : £{Math.ceil((this.state.hasDiscount ? this.state.discountedPrice : this.state.price) * 1.015) + parseInt(this.state.markup)}
+                  </strong>
+                </p>
+              ) : (
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-gray-600)', marginTop: '1rem' }}>
+                  <strong>Or on a 5 year contract Hire at £ per week<br />
+                  3 year lease purchase at £ per week</strong>
+                </p>
+              )}
             </div>
 
             <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -690,9 +701,9 @@ class QuoteDetail extends Component {
         {/* Footer */}
         <footer className="footer">
           <div className="footer-content">
-            <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
-            <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
-              maximalforklift.co.uk
+            <p className="footer-text">© {brandConfig.copyrightYear} {brandConfig.footerText}</p>
+            <a href={brandConfig.mainSiteUrl} className="footer-link" target="_blank" rel="noopener noreferrer">
+              {brandConfig.mainSiteLabel}
             </a>
           </div>
         </footer>

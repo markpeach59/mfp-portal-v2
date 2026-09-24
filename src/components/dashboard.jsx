@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
+import { isSAMUK, brandConfig } from "../config/brand";
 import { MARKETING_CATEGORIES } from "../config/marketingCategories";
 
 class Dashboard extends Component {
@@ -44,45 +45,47 @@ class Dashboard extends Component {
         to: "/configurator",
         badge: null
       },
-      {
-        id: "stock",
-        title: "Stock List",
-        description: "Download the latest available stock inventory",
-        icon: (
-          <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        ),
-        to: "/stock",
-        badge: "Updated Today",
-        badgeClass: "badge-success"
-      },
-      {
-        id: "marketing",
-        title: "Marketing Images",
-        description: "Access brochures, product photos and promotional materials",
-        icon: (
-          <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        ),
-        to: "/marketing",
-        badge: `${MARKETING_CATEGORIES.length} Categories`,
-        badgeClass: "badge-info"
-      },
-      {
-        id: "offers",
-        title: "Current Offers",
-        description: "View and download the latest promotional offers",
-        icon: (
-          <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-        ),
-        to: "/offers",
-        badge: "3 New",
-        badgeClass: "badge-warning"
-      }
+      ...(!isSAMUK ? [
+        {
+          id: "stock",
+          title: "Stock List",
+          description: "Download the latest available stock inventory",
+          icon: (
+            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          ),
+          to: "/stock",
+          badge: "Updated Today",
+          badgeClass: "badge-success"
+        },
+        {
+          id: "marketing",
+          title: "Marketing Images",
+          description: "Access brochures, product photos and promotional materials",
+          icon: (
+            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          ),
+          to: "/marketing",
+          badge: `${MARKETING_CATEGORIES.length} Categories`,
+          badgeClass: "badge-info"
+        },
+        {
+          id: "offers",
+          title: "Current Offers",
+          description: "View and download the latest promotional offers",
+          icon: (
+            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          ),
+          to: "/offers",
+          badge: "3 New",
+          badgeClass: "badge-warning"
+        }
+      ] : [])
     ];
 
     const adminTiles = [
@@ -158,7 +161,7 @@ class Dashboard extends Component {
         to: "/admin/register-user",
         requireAdmin: true // Admin only
       },
-      {
+      ...(!isSAMUK ? [{
         id: "managefiles",
         title: "Manage Files",
         description: "Upload and manage",
@@ -169,7 +172,7 @@ class Dashboard extends Component {
         ),
         to: "/admin/files",
         requireAdmin: true // Admin only
-      }
+      }] : [])
     ];
 
     // Filter admin tiles based on user role
@@ -185,10 +188,10 @@ class Dashboard extends Component {
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
-            <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+            <a href={brandConfig.mainSiteUrl} className="header-link" target="_blank" rel="noopener noreferrer">
               Main Site
             </a>
             <div className="header-user">
@@ -275,9 +278,9 @@ class Dashboard extends Component {
         {/* Footer */}
         <footer className="footer">
           <div className="footer-content">
-            <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
-            <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
-              maximalforklift.co.uk
+            <p className="footer-text">© {brandConfig.copyrightYear} {brandConfig.footerText}</p>
+            <a href={brandConfig.mainSiteUrl} className="footer-link" target="_blank" rel="noopener noreferrer">
+              {brandConfig.mainSiteLabel}
             </a>
           </div>
         </footer>

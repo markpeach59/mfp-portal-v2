@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link, Route, Switch, Redirect } from "react-router-dom";
 import auth from "../services/authService";
+import { brandConfig } from "../config/brand";
 
 // Import existing components
 import Forklifts from "./forklifts";
@@ -40,10 +41,10 @@ class ConfiguratorLayout extends Component {
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
-            <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
+            <a href={brandConfig.mainSiteUrl} className="header-link" target="_blank" rel="noopener noreferrer">
               Main Site
             </a>
             <div className="header-user">
@@ -109,9 +110,9 @@ class ConfiguratorLayout extends Component {
         {/* Footer */}
         <footer className="footer">
           <div className="footer-content">
-            <p className="footer-text">© 2026 Maximal UK - Dealer Portal</p>
-            <a href="https://maximalforklift.co.uk" className="footer-link" target="_blank" rel="noopener noreferrer">
-              maximalforklift.co.uk
+            <p className="footer-text">© {brandConfig.copyrightYear} {brandConfig.footerText}</p>
+            <a href={brandConfig.mainSiteUrl} className="footer-link" target="_blank" rel="noopener noreferrer">
+              {brandConfig.mainSiteLabel}
             </a>
           </div>
         </footer>
