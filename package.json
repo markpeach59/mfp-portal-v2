@@ -23,6 +23,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:maximal": "REACT_APP_BRAND=maximal REACT_APP_API_URL=http://35.179.170.23:3900/api react-scripts build",
+    "build:samuk": "REACT_APP_BRAND=samuk REACT_APP_API_URL=http://18.170.39.166:3900/api react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
