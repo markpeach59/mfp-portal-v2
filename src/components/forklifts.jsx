@@ -5,6 +5,7 @@ import { getDealerDetail } from "../services/dealerService";
 import { getForklifts } from "../services/forkliftsService";
 import { getEngTypes } from "../services/fakeEngTypeFilterService";
 import { getCapacityFilters } from "../services/fakeCapacityFilterService";
+import { isSAMUK } from "../config/brand";
 
 class Forklifts extends Component {
   state = {
@@ -19,13 +20,16 @@ class Forklifts extends Component {
     this.setState({ user });
 
     let isrestricted = false;
-    const test = localStorage.getItem("restricted");
-    if (test) isrestricted = true;
 
-    if (user.dealerId) {
-      const { data: dealery } = await getDealerDetail(user.dealerId);
-      if (dealery.isRestricted) {
-        isrestricted = true;
+    if (!isSAMUK) {
+      const test = localStorage.getItem("restricted");
+      if (test) isrestricted = true;
+
+      if (user.dealerId) {
+        const { data: dealery } = await getDealerDetail(user.dealerId);
+        if (dealery.isRestricted) {
+          isrestricted = true;
+        }
       }
     }
 
@@ -37,7 +41,7 @@ class Forklifts extends Component {
 
     const { data: forklifts } = await getForklifts();
 
-    if (isrestricted) {
+    if (!isSAMUK && isrestricted) {
       localStorage.setItem("restricted", "true");
     }
 
@@ -54,11 +58,13 @@ class Forklifts extends Component {
 
   toggleTheme = () => {
     const now = !this.state.restricted;
-    
-    if (now) {
-      localStorage.setItem("restricted", "true");
-    } else {
-      localStorage.removeItem("restricted");
+
+    if (!isSAMUK) {
+      if (now) {
+        localStorage.setItem("restricted", "true");
+      } else {
+        localStorage.removeItem("restricted");
+      }
     }
 
     this.setState({ restricted: now });
@@ -163,8 +169,8 @@ class Forklifts extends Component {
 
     return (
       <div>
-        {/* Admin Toggle for Restricted Pricing */}
-        {isAdmin && (
+        {/* Admin Toggle for Restricted Pricing — Maximal only */}
+        {!isSAMUK && isAdmin && (
           <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--color-gray-50)', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--color-gray-200)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
