@@ -32,6 +32,7 @@ class OrderDetail extends Component {
       engtype: forky.engtype,
       powertrain: forky.powertrain,
       imgName: forky.imgname,
+      dualdrive: forky.dualdrive,
       masttype: forky.masttype,
       mastsize: forky.mastsize,
       closedheight: forky.closedheight,
@@ -148,6 +149,8 @@ class OrderDetail extends Component {
               <ConditionalWrapper condition={this.state.powertrain} wrapper={(children) => <>{children}</>}>
                 {this.state.powertrain}<br />
               </ConditionalWrapper>
+
+              {this.state.dualdrive ? <><br />Dual Drive as Standard<br /></> : null}
 
               Capacity : {this.state.capacity}Kg 
               <ConditionalWrapper condition={this.state.loadcenter} wrapper={(children) => <>{children}</>}>

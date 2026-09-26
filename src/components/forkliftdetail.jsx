@@ -137,6 +137,7 @@ class ForkliftDetail extends Component {
       model: forky.model,
       imgName: forky.imgName,
       displayedImageName: forky.imgName,
+      dualdrive: forky.dualdrive,
       engType: forky.engType,
       powertrain: forky.powertrain,
       iengine: forky.powertrain,
@@ -449,6 +450,7 @@ class ForkliftDetail extends Component {
     if (notes) quote.notes = notes;
 
     quote.offer = this.state.offer;
+    if (this.state.dualdrive) quote.dualdrive = true;
 
     if (this.state.offer){
 
@@ -1679,7 +1681,10 @@ return
               <ForkliftImg imgName={this.state.displayedImageName} />
             ) : null}
 
-            
+            {this.state.dualdrive ? (
+              <p><strong>Dual Drive as Standard</strong></p>
+            ) : null}
+
             <br /> {this.state.engType}<br />
             
             <ConditionalWrapper

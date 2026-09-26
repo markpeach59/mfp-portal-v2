@@ -47,6 +47,7 @@ class QuoteDetail extends Component {
       powertrain: forky.powertrain,
       modelseries: forky.modelseries,
       imgName: forky.imgname,
+      dualdrive: forky.dualdrive,
       masttype: forky.masttype,
       mastsize: forky.mastsize,
       mastpoa: forky.mastpoa,
@@ -396,6 +397,8 @@ class QuoteDetail extends Component {
                 {this.state.modelseries && this.state.powertrain ? " - " + this.state.modelseries : ""}
                 {" "}
               </ConditionalWrapper>
+
+              {this.state.dualdrive ? <><br />Dual Drive as Standard</> : null}
 
               Capacity : {this.state.capacity}Kg 
               <ConditionalWrapper
