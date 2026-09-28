@@ -185,7 +185,7 @@ class QuoteDetail extends Component {
         {/* Header */}
         <header className="header">
           <div className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </div>
           <nav className="header-nav">
             <a href={brandConfig.mainSiteUrl} className="header-link" target="_blank" rel="noopener noreferrer">
