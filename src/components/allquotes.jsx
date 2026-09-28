@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React, { Component } from "react";
+import { brandConfig } from "../config/brand";
 import { Link } from "react-router-dom";
 import { getAllQuotes } from "../services/allQuotesService";
 import { getUsers } from "../services/userService";
@@ -88,7 +89,7 @@ class AllQuotes extends Component {
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
             <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import { getDealerDetail } from "../services/dealerService";
-import { isSAMUK } from "../config/brand";
+import { isSAMUK, brandConfig } from "../config/brand";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -1502,7 +1502,7 @@ return
         <div className="page-container">
           <header className="header">
             <div className="header-logo">
-              <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+              <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
             </div>
             <nav className="header-nav">
               <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
@@ -1555,7 +1555,7 @@ return
         <div className="page-container">
           <header className="header">
             <div className="header-logo">
-              <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+              <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
             </div>
             <nav className="header-nav">
               <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">
@@ -1608,7 +1608,7 @@ return
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
             <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { brandConfig } from "../config/brand";
 import auth from "../services/authService";
 
 class LoginForm extends Component {
@@ -39,7 +40,7 @@ class LoginForm extends Component {
         {/* Header */}
         <header className="header">
           <div className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </div>
           <a 
             href="https://maximalforklift.co.uk"

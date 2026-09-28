@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { brandConfig } from "../config/brand";
 import { Link } from "react-router-dom";
 import { registerUser } from "../services/userService";
 import auth from "../services/authService";
@@ -82,7 +83,7 @@ class RegisterForm extends Component {
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
             <a href="https://maximalforklift.co.uk" className="header-link" target="_blank" rel="noopener noreferrer">

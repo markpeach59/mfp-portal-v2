@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { brandConfig } from "../config/brand";
 import { Link } from 'react-router-dom';
 import FileUploader from './FileUploader';
 import fileApi from '../services/fileApi';
@@ -209,7 +210,7 @@ class AdminFileManager extends Component {
         {/* Header */}
         <header className="header">
           <Link to="/" className="header-logo">
-            <img src="/img/logo-black.png" alt="Maximal Forklifts UK" style={{ height: '40px' }} />
+            <img src={brandConfig.logo} alt={brandConfig.name} style={{ height: '40px' }} />
           </Link>
           <nav className="header-nav">
             <Link to="/" className="header-link">
