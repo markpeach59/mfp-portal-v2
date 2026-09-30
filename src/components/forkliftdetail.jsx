@@ -264,6 +264,7 @@ class ForkliftDetail extends Component {
     let percentage = 0;
     let hasDiscount = false;
     
+    
     // Check all discount conditions
     if (currentState.offer) {
       hasDiscount = true;
@@ -276,6 +277,7 @@ class ForkliftDetail extends Component {
       }
     }
     
+    /*
     if (currentState.selectedVoltage?.label[0] === 'S') {
       hasDiscount = true;
       percentage = 0.15;
@@ -285,12 +287,15 @@ class ForkliftDetail extends Component {
       hasDiscount = true;
       percentage = 0.10;
     }
-    
+    */
+
+    /*
     if (currentState.modeldescription?.[0]?.description === 'AA Series') {
       hasDiscount = true;
       percentage = 0.025;
     }
-    
+    */
+   
     if (currentState.selectedChassis?.label === 'Lithium Version') {
       hasDiscount = true;
       percentage = 0.03;

@@ -9,6 +9,7 @@ const Offertext = props =>  {
 
   console.log("Model on Offer", model);
 
+  /*
   if ( model === 'AA'){
     return (<React.Fragment>
 
@@ -16,6 +17,7 @@ const Offertext = props =>  {
       <br />
       <br />
     </React.Fragment>)};
+*/
 
 if ( model === 'Reach'){
   return (<React.Fragment>
@@ -26,7 +28,7 @@ if ( model === 'Reach'){
   </React.Fragment>)};
 
  
-
+/*
 
   if ( model === 'FBAX50-YWL'){
     return (<React.Fragment>
@@ -36,7 +38,7 @@ if ( model === 'Reach'){
       <br />
       </React.Fragment>)};
 
- 
+ */
 // default offer
   return (
         <React.Fragment>
