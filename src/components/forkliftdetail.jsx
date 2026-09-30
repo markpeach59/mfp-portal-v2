@@ -266,6 +266,7 @@ class ForkliftDetail extends Component {
     
     
     // Check all discount conditions
+    /*
     if (currentState.offer) {
       hasDiscount = true;
       if (currentState.model === 'FBAX50-YWL') {
@@ -276,7 +277,8 @@ class ForkliftDetail extends Component {
         percentage = 0.10;
       }
     }
-    
+    */
+   
     /*
     if (currentState.selectedVoltage?.label[0] === 'S') {
       hasDiscount = true;
@@ -295,14 +297,16 @@ class ForkliftDetail extends Component {
       percentage = 0.025;
     }
     */
-   
+
+    /* New Reach Models */
     if (currentState.selectedChassis?.label === 'Lithium Version') {
       hasDiscount = true;
       percentage = 0.03;
     }
+
     
-    // IMPORTANT: Entry Level voltage overrides all discounts
-    if (currentState.selectedVoltage?.label[0] === 'L') {
+    // First reach Model does not have a Discount
+    if (currentState.model === 'FBRA15-J1') {
       hasDiscount = false;
       percentage = 0;
     }
@@ -1663,7 +1667,7 @@ return
             ): null}
 
 
-{( this.state.engType && this.state.engType==='Reach' ) ? (
+{( this.state.engType && this.state.engType==='Reach' && this.state.model !== 'FBRA15-J1') ? (
              <Offertext model={'Reach'} />
              ): null}
 <Grid>
