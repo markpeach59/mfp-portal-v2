@@ -655,27 +655,22 @@ class ForkliftDetail extends Component {
   };
 
   handleEngineSel = (engine) => {
-    // Calculate old price adjustment
+    // Calculate old price adjustment — engines now use absolute basePrice/basePriceR
     let oldPriceAdjustment = 0;
     if (this.state.selectedEngine) {
-      if (!isSAMUK && this.state.restricted && this.state.selectedEngine.basepriceR !== undefined) {
-        // Calculate equivalent price adjustment from absolute basepriceR
-        oldPriceAdjustment = this.state.selectedEngine.basepriceR - this.state.baseprice;
+      if (!isSAMUK && this.state.restricted && this.state.selectedEngine.basePriceR !== undefined) {
+        oldPriceAdjustment = this.state.selectedEngine.basePriceR - this.state.baseprice;
       } else {
-        // Use normal engine price for old engine
-        oldPriceAdjustment = this.state.selectedEngine.price;
+        oldPriceAdjustment = this.state.selectedEngine.basePrice - this.state.baseprice;
       }
     }
 
     // Calculate new price adjustment
     let newPriceAdjustment;
-    if (!isSAMUK && this.state.restricted && engine.basepriceR !== undefined) {
-      // Calculate equivalent price adjustment from absolute basepriceR
-      // basepriceR is the total base price (e.g. 12980), so we calculate the difference
-      newPriceAdjustment = engine.basepriceR - this.state.baseprice;
+    if (!isSAMUK && this.state.restricted && engine.basePriceR !== undefined) {
+      newPriceAdjustment = engine.basePriceR - this.state.baseprice;
     } else {
-      // Use normal engine price for new engine
-      newPriceAdjustment = engine.price;
+      newPriceAdjustment = engine.basePrice - this.state.baseprice;
     }
 
     const newprice = this.state.totalprice + newPriceAdjustment - oldPriceAdjustment;
