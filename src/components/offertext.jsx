@@ -22,7 +22,7 @@ const Offertext = props =>  {
 if ( model === 'Reach'){
   return (<React.Fragment>
 
-    <Typography variant="h6">Current Offer : 3% off Lithium Powered Reach trunks</Typography>
+    <Typography variant="h6">Current Offer : 3% off Lithium Powered Reach Trucks</Typography>
     <br />
     <br />
   </React.Fragment>)};
