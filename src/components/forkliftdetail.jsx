@@ -310,6 +310,12 @@ class ForkliftDetail extends Component {
       hasDiscount = false;
       percentage = 0;
     }
+
+    // First reach Model does not have a Discount
+    if (currentState.model === 'FBRA15') {
+      hasDiscount = false;
+      percentage = 0;
+    }
     
     const amount = hasDiscount ? Math.round(price * percentage) : 0;
     const discountedPrice = hasDiscount ? price - amount : null;
