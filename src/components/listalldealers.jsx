@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { getDealers, setDealerRestricted } from "../services/dealerService";
 import auth from "../services/authService";
-import { isSAMUK } from "../config/brand";
 
 class ListAllDealers extends Component {
   state = {
@@ -185,57 +184,55 @@ class ListAllDealers extends Component {
                       </div>
                     </div>
                     
-                    {!isSAMUK && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                        {dealer.isRestricted ? (
-                          <span className="badge badge-warning">Restricted Pricing</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                      {dealer.isRestricted ? (
+                        <span className="badge badge-warning">Restricted Pricing</span>
+                      ) : (
+                        <span />
+                      )}
+                      {isAdmin && (
+                        dealer.isRestricted ? (
+                          <button
+                            onClick={() => this.handleRestrictClick(dealer, 'unrestrict')}
+                            style={{
+                              background: 'none',
+                              border: '1px solid var(--color-success, #16a34a)',
+                              color: 'var(--color-success, #16a34a)',
+                              borderRadius: '4px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Remove Restriction
+                          </button>
                         ) : (
-                          <span />
-                        )}
-                        {isAdmin && (
-                          dealer.isRestricted ? (
-                            <button
-                              onClick={() => this.handleRestrictClick(dealer, 'unrestrict')}
-                              style={{
-                                background: 'none',
-                                border: '1px solid var(--color-success, #16a34a)',
-                                color: 'var(--color-success, #16a34a)',
-                                borderRadius: '4px',
-                                padding: '3px 10px',
-                                fontSize: '0.775rem',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              Remove Restriction
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => this.handleRestrictClick(dealer, 'restrict')}
-                              style={{
-                                background: 'none',
-                                border: '1px solid #f59e0b',
-                                color: '#92400e',
-                                borderRadius: '4px',
-                                padding: '3px 10px',
-                                fontSize: '0.775rem',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              Restrict Pricing
-                            </button>
-                          )
-                        )}
-                      </div>
-                    )}
+                          <button
+                            onClick={() => this.handleRestrictClick(dealer, 'restrict')}
+                            style={{
+                              background: 'none',
+                              border: '1px solid #f59e0b',
+                              color: '#92400e',
+                              borderRadius: '4px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Restrict Pricing
+                          </button>
+                        )
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
 
               {/* Summary Stats */}
               <div className="card mt-lg">
-                <div style={{ display: 'grid', gridTemplateColumns: isSAMUK ? '1fr' : 'repeat(2, 1fr)', gap: '2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
                   <div>
                     <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-gray-500)', marginBottom: '0.5rem' }}>
                       Total Dealers
@@ -244,16 +241,14 @@ class ListAllDealers extends Component {
                       {count}
                     </p>
                   </div>
-                  {!isSAMUK && (
-                    <div>
-                      <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-gray-500)', marginBottom: '0.5rem' }}>
-                        Restricted Access
-                      </p>
-                      <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: 0 }}>
-                        {d.filter(dealer => dealer.isRestricted).length}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-gray-500)', marginBottom: '0.5rem' }}>
+                      Restricted Access
+                    </p>
+                    <p style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-gray-800)', margin: 0 }}>
+                      {d.filter(dealer => dealer.isRestricted).length}
+                    </p>
+                  </div>
                 </div>
               </div>
             </>
