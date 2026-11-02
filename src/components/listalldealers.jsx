@@ -1,13 +1,20 @@
 import React, { Component } from "react";
 import { brandConfig } from "../config/brand";
 import { Link } from "react-router-dom";
-import { getDealers } from "../services/dealerService";
+import { getDealers, setDealerRestricted } from "../services/dealerService";
 import auth from "../services/authService";
 
 class ListAllDealers extends Component {
   state = {
     dealers: [],
-    user: null
+    user: null,
+    // restrict dialog state
+    restrictDialogOpen: false,
+    restrictTarget: null,     // dealer object
+    restrictAction: null,     // 'restrict' | 'unrestrict'
+    restrictLoading: false,
+    snackbarOpen: false,
+    snackbarMessage: "",
   };
 
   async componentDidMount() {
@@ -27,8 +34,67 @@ class ListAllDealers extends Component {
     return fullname.substring(0, 2).toUpperCase();
   }
 
+  handleRestrictClick = (dealer, action) => {
+    this.setState({
+      restrictDialogOpen: true,
+      restrictTarget: dealer,
+      restrictAction: action,
+    });
+  };
+
+  handleRestrictCancel = () => {
+    this.setState({
+      restrictDialogOpen: false,
+      restrictTarget: null,
+      restrictAction: null,
+    });
+  };
+
+  handleRestrictConfirm = async () => {
+    const { restrictTarget, restrictAction, dealers } = this.state;
+    const isRestricted = restrictAction === 'restrict';
+    this.setState({ restrictLoading: true });
+
+    try {
+      await setDealerRestricted(restrictTarget._id, isRestricted);
+      const updatedDealers = dealers.map(d =>
+        d._id === restrictTarget._id ? { ...d, isRestricted } : d
+      );
+      this.setState({
+        dealers: updatedDealers,
+        restrictDialogOpen: false,
+        restrictTarget: null,
+        restrictAction: null,
+        restrictLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: isRestricted
+          ? `${restrictTarget.dealername} has been set to restricted pricing.`
+          : `Restriction removed from ${restrictTarget.dealername}.`,
+      });
+    } catch (ex) {
+      this.setState({
+        restrictLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: "Failed to update dealer. Please try again.",
+      });
+    }
+  };
+
+  handleSnackbarClose = () => {
+    this.setState({ snackbarOpen: false, snackbarMessage: "" });
+  };
+
   render() {
-    const { dealers: d, user } = this.state;
+    const {
+      dealers: d,
+      user,
+      restrictDialogOpen,
+      restrictTarget,
+      restrictAction,
+      restrictLoading,
+      snackbarOpen,
+      snackbarMessage,
+    } = this.state;
     const { length: count } = d;
 
     if (!user) return <p>Loading...</p>;
@@ -119,11 +185,48 @@ class ListAllDealers extends Component {
                       </div>
                     </div>
                     
-                    {dealer.isRestricted && (
-                      <span className="badge badge-warning" style={{ marginTop: '0.5rem' }}>
-                        Restricted Pricing
-                      </span>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                      {dealer.isRestricted ? (
+                        <span className="badge badge-warning">Restricted Pricing</span>
+                      ) : (
+                        <span />
+                      )}
+                      {isAdmin && (
+                        dealer.isRestricted ? (
+                          <button
+                            onClick={() => this.handleRestrictClick(dealer, 'unrestrict')}
+                            style={{
+                              background: 'none',
+                              border: '1px solid var(--color-success, #16a34a)',
+                              color: 'var(--color-success, #16a34a)',
+                              borderRadius: '4px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Remove Restriction
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => this.handleRestrictClick(dealer, 'restrict')}
+                            style={{
+                              background: 'none',
+                              border: '1px solid #f59e0b',
+                              color: '#92400e',
+                              borderRadius: '4px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Restrict Pricing
+                          </button>
+                        )
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -162,6 +265,78 @@ class ListAllDealers extends Component {
             </a>
           </div>
         </footer>
+
+        {/* Restrict / Unrestrict Confirmation Dialog */}
+        {restrictDialogOpen && restrictTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                {restrictAction === 'restrict' ? 'Restrict Pricing' : 'Remove Restriction'}
+              </h3>
+              <p style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-700)' }}>
+                {restrictAction === 'restrict'
+                  ? <>Are you sure you want to restrict <strong>{restrictTarget.dealername}</strong>? Their users will see restricted pricing in the configurator.</>
+                  : <>Are you sure you want to remove the restriction from <strong>{restrictTarget.dealername}</strong>? Their users will return to standard pricing.</>
+                }
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={this.handleRestrictCancel}
+                  disabled={restrictLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px',
+                    border: '1px solid var(--color-gray-300, #d1d5db)',
+                    background: '#fff', color: 'var(--color-gray-700)',
+                    cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={this.handleRestrictConfirm}
+                  disabled={restrictLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: 'none',
+                    background: restrictAction === 'restrict' ? '#f59e0b' : 'var(--color-success, #16a34a)',
+                    color: '#fff',
+                    cursor: restrictLoading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.875rem',
+                    opacity: restrictLoading ? 0.7 : 1,
+                  }}
+                >
+                  {restrictLoading
+                    ? 'Saving...'
+                    : restrictAction === 'restrict' ? 'Restrict Pricing' : 'Remove Restriction'
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Snackbar */}
+        {snackbarOpen && (
+          <div style={{
+            position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+            background: '#1f2937', color: '#fff', padding: '0.75rem 1.5rem',
+            borderRadius: '6px', fontSize: '0.875rem', zIndex: 1001,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}>
+            {snackbarMessage}
+            <button
+              onClick={this.handleSnackbarClose}
+              style={{ marginLeft: '1rem', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: '1rem' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
     );
   }
