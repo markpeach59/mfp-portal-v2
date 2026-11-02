@@ -18,3 +18,11 @@ export function assignDealertouser(userid, dealerid) {
 export function removeDealerfromuser(userid) {
   return http.post(apiEndPoint + "/removedealer", { userid }); 
 }
+
+export function getUserSummary(id) {
+  return http.get(apiEndPoint + "/" + id + "/summary");
+}
+
+export function deleteUser(id) {
+  return http.delete(apiEndPoint + "/" + id);
+}

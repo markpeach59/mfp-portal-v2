@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { getUsers } from "../services/userService";
+import { getUsers, getUserSummary, deleteUser } from "../services/userService";
 import { getDealers } from "../services/dealerService";
 import Assigndealer from "./assigndealer";
 import { assignDealertouser, removeDealerfromuser } from "../services/userService";
@@ -11,7 +11,14 @@ class ListAllUsers extends Component {
   state = {
     users: [],
     dealers: [],
-    user: null
+    user: null,
+    // delete dialog state
+    deleteDialogOpen: false,
+    deleteTarget: null,       // the user object to be deleted
+    deleteSummary: null,      // { quoteCount, orderCount }
+    deleteLoading: false,
+    deleteSnackbarOpen: false,
+    deleteSnackbarMessage: "",
   };
 
   async componentDidMount() {
@@ -49,8 +56,65 @@ class ListAllUsers extends Component {
     assignDealertouser(user._id, newdealerId);
   };
 
+  handleDeleteClick = async (targetUser) => {
+    // Fetch quote/order counts before opening the dialog
+    const { data: summary } = await getUserSummary(targetUser._id);
+    this.setState({
+      deleteDialogOpen: true,
+      deleteTarget: targetUser,
+      deleteSummary: summary,
+    });
+  };
+
+  handleDeleteCancel = () => {
+    this.setState({
+      deleteDialogOpen: false,
+      deleteTarget: null,
+      deleteSummary: null,
+    });
+  };
+
+  handleDeleteConfirm = async () => {
+    const { deleteTarget, users } = this.state;
+    this.setState({ deleteLoading: true });
+
+    try {
+      await deleteUser(deleteTarget._id);
+      const updatedUsers = users.filter(u => u._id !== deleteTarget._id);
+      this.setState({
+        users: updatedUsers,
+        deleteDialogOpen: false,
+        deleteTarget: null,
+        deleteSummary: null,
+        deleteLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: `${deleteTarget.name} has been deleted.`,
+      });
+    } catch (ex) {
+      this.setState({
+        deleteLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: "Failed to delete user. Please try again.",
+      });
+    }
+  };
+
+  handleDeleteSnackbarClose = () => {
+    this.setState({ deleteSnackbarOpen: false, deleteSnackbarMessage: "" });
+  };
+
   render() {
-    const { users: u, dealers: d, user } = this.state;
+    const {
+      users: u,
+      dealers: d,
+      user,
+      deleteDialogOpen,
+      deleteTarget,
+      deleteSummary,
+      deleteLoading,
+      deleteSnackbarOpen,
+      deleteSnackbarMessage,
+    } = this.state;
     const { length: count } = u;
 
     if (!user) return <p>Loading...</p>;
@@ -160,11 +224,32 @@ class ListAllUsers extends Component {
                           )}
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          <Assigndealer
-                            user={x}
-                            dealers={d}
-                            onAssigndealer={this.handleAssigndealer}
-                          />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <Assigndealer
+                              user={x}
+                              dealers={d}
+                              onAssigndealer={this.handleAssigndealer}
+                            />
+                            {/* Only show Delete for non-admin users who are not the logged-in user */}
+                            {isAdmin && !x.isAdmin && x._id !== user._id && (
+                              <button
+                                onClick={() => this.handleDeleteClick(x)}
+                                style={{
+                                  background: 'none',
+                                  border: '1px solid var(--color-danger, #dc2626)',
+                                  color: 'var(--color-danger, #dc2626)',
+                                  borderRadius: '4px',
+                                  padding: '4px 10px',
+                                  fontSize: '0.8rem',
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap',
+                                }}
+                                title="Delete user"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -222,6 +307,88 @@ class ListAllUsers extends Component {
             </a>
           </div>
         </footer>
+
+        {/* Delete Confirmation Dialog */}
+        {deleteDialogOpen && deleteTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Delete User
+              </h3>
+              <p style={{ margin: '0 0 1rem', color: 'var(--color-gray-700)' }}>
+                Are you sure you want to delete <strong>{deleteTarget.name}</strong> ({deleteTarget.email})?
+                This action cannot be undone.
+              </p>
+
+              {/* Warning if user has quotes or orders */}
+              {deleteSummary && (deleteSummary.quoteCount > 0 || deleteSummary.orderCount > 0) && (
+                <div style={{
+                  background: '#fffbeb', border: '1px solid #f59e0b',
+                  borderRadius: '6px', padding: '0.75rem 1rem', marginBottom: '1.25rem',
+                }}>
+                  <p style={{ margin: '0 0 0.25rem', fontWeight: '600', color: '#92400e', fontSize: '0.875rem' }}>
+                    ⚠ Warning: This user has existing data
+                  </p>
+                  <p style={{ margin: 0, color: '#92400e', fontSize: '0.875rem' }}>
+                    {deleteSummary.quoteCount > 0 && `${deleteSummary.quoteCount} quote${deleteSummary.quoteCount !== 1 ? 's' : ''}`}
+                    {deleteSummary.quoteCount > 0 && deleteSummary.orderCount > 0 && ' and '}
+                    {deleteSummary.orderCount > 0 && `${deleteSummary.orderCount} order${deleteSummary.orderCount !== 1 ? 's' : ''}`}
+                    {' will remain in the system but will no longer be associated with an active user.'}
+                  </p>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={this.handleDeleteCancel}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: '1px solid var(--color-gray-300, #d1d5db)',
+                    background: '#fff', color: 'var(--color-gray-700)', cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={this.handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: 'none',
+                    background: 'var(--color-danger, #dc2626)', color: '#fff',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer', fontSize: '0.875rem',
+                    opacity: deleteLoading ? 0.7 : 1,
+                  }}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete User'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete result snackbar */}
+        {deleteSnackbarOpen && (
+          <div style={{
+            position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+            background: '#1f2937', color: '#fff', padding: '0.75rem 1.5rem',
+            borderRadius: '6px', fontSize: '0.875rem', zIndex: 1001,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}>
+            {deleteSnackbarMessage}
+            <button
+              onClick={this.handleDeleteSnackbarClose}
+              style={{ marginLeft: '1rem', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: '1rem' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
     );
   }
