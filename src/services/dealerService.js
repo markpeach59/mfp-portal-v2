@@ -15,3 +15,7 @@ export function getDealerDetail(id) {
   const apiEndPoint = config.apiURL + "/dealers/" + id;
   return http.get(apiEndPoint);
 }
+
+export function setDealerRestricted(id, isRestricted) {
+  return http.patch(apiEndPoint + "/" + id, { isRestricted });
+}
