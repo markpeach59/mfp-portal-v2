@@ -108,6 +108,7 @@ class ListAllUsers extends Component {
 
   handleDeleteSnackbarClose = () => {
     this.setState({ deleteSnackbarOpen: false, deleteSnackbarMessage: "" });
+  };
 
   handleAddUserOpen = () => {
     this.setState({ addUserDialogOpen: true, addUserName: "", addUserEmail: "", addUserPassword: "", addUserError: null });
@@ -156,9 +157,6 @@ class ListAllUsers extends Component {
         addUserError: ex.response?.data || "Failed to add user. Please try again.",
       });
     }
-  };
-
-
   };
 
   render() {
