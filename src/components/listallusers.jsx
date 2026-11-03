@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { getUsers, getUserSummary, deleteUser } from "../services/userService";
+import { getUsers, getUserSummary, deleteUser, registerUser } from "../services/userService";
 import { getDealers } from "../services/dealerService";
 import Assigndealer from "./assigndealer";
 import { assignDealertouser, removeDealerfromuser } from "../services/userService";
@@ -19,6 +19,13 @@ class ListAllUsers extends Component {
     deleteLoading: false,
     deleteSnackbarOpen: false,
     deleteSnackbarMessage: "",
+    // add user dialog state
+    addUserDialogOpen: false,
+    addUserName: "",
+    addUserEmail: "",
+    addUserPassword: "",
+    addUserLoading: false,
+    addUserError: null,
   };
 
   async componentDidMount() {
@@ -101,6 +108,57 @@ class ListAllUsers extends Component {
 
   handleDeleteSnackbarClose = () => {
     this.setState({ deleteSnackbarOpen: false, deleteSnackbarMessage: "" });
+
+  handleAddUserOpen = () => {
+    this.setState({ addUserDialogOpen: true, addUserName: "", addUserEmail: "", addUserPassword: "", addUserError: null });
+  };
+
+  handleAddUserCancel = () => {
+    this.setState({ addUserDialogOpen: false, addUserName: "", addUserEmail: "", addUserPassword: "", addUserError: null });
+  };
+
+  handleAddUserChange = (field, value) => {
+    this.setState({ [field]: value, addUserError: null });
+  };
+
+  handleAddUserSubmit = async (e) => {
+    e.preventDefault();
+    const { addUserName, addUserEmail, addUserPassword, users } = this.state;
+
+    if (!addUserName.trim()) {
+      this.setState({ addUserError: "Full name is required." });
+      return;
+    }
+    if (!addUserEmail.trim()) {
+      this.setState({ addUserError: "Email address is required." });
+      return;
+    }
+    if (!addUserPassword || addUserPassword.length < 6) {
+      this.setState({ addUserError: "Password must be at least 6 characters." });
+      return;
+    }
+
+    this.setState({ addUserLoading: true, addUserError: null });
+
+    try {
+      const { data: newUser } = await registerUser(addUserName.trim(), addUserEmail.trim().toLowerCase(), addUserPassword);
+      this.setState({
+        users: [...users, newUser],
+        addUserDialogOpen: false,
+        addUserName: "", addUserEmail: "", addUserPassword: "",
+        addUserLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: `${newUser.name} has been added.`,
+      });
+    } catch (ex) {
+      this.setState({
+        addUserLoading: false,
+        addUserError: ex.response?.data || "Failed to add user. Please try again.",
+      });
+    }
+  };
+
+
   };
 
   render() {
@@ -114,6 +172,12 @@ class ListAllUsers extends Component {
       deleteLoading,
       deleteSnackbarOpen,
       deleteSnackbarMessage,
+      addUserDialogOpen,
+      addUserName,
+      addUserEmail,
+      addUserPassword,
+      addUserLoading,
+      addUserError,
     } = this.state;
     const { length: count } = u;
 
@@ -168,9 +232,27 @@ class ListAllUsers extends Component {
             Back to Dashboard
           </Link>
 
-          <div className="mb-lg">
-            <h2 className="page-title">User Management</h2>
-            <p className="page-subtitle">Manage user accounts and dealer assignments</p>
+          <div className="mb-lg" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div>
+              <h2 className="page-title">User Management</h2>
+              <p className="page-subtitle">Manage user accounts and dealer assignments</p>
+            </div>
+            {isAdmin && (
+              <button
+                onClick={this.handleAddUserOpen}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '8px 16px', borderRadius: '4px', border: 'none',
+                  background: 'var(--color-primary, #1d4ed8)', color: '#fff',
+                  fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add User
+              </button>
+            )}
           </div>
 
           {count === 0 ? (
@@ -371,6 +453,111 @@ class ListAllUsers extends Component {
             </div>
           </div>
         )}
+
+        {/* Add User Modal */}
+        {addUserDialogOpen && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Add User
+              </h3>
+
+              {addUserError && (
+                <div style={{
+                  background: 'var(--color-danger-bg, #fef2f2)',
+                  border: '1px solid var(--color-danger, #dc2626)',
+                  borderRadius: '6px', padding: '0.75rem 1rem', marginBottom: '1rem',
+                  color: 'var(--color-danger, #dc2626)', fontSize: '0.875rem',
+                }}>
+                  {addUserError}
+                </div>
+              )}
+
+              <form onSubmit={this.handleAddUserSubmit}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-700)' }} htmlFor="addUserName">
+                    Full Name *
+                  </label>
+                  <input
+                    id="addUserName"
+                    type="text"
+                    className="form-input"
+                    value={addUserName}
+                    onChange={(e) => this.handleAddUserChange('addUserName', e.target.value)}
+                    placeholder="Enter user's full name"
+                    autoFocus
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-700)' }} htmlFor="addUserEmail">
+                    Email Address *
+                  </label>
+                  <input
+                    id="addUserEmail"
+                    type="email"
+                    className="form-input"
+                    value={addUserEmail}
+                    onChange={(e) => this.handleAddUserChange('addUserEmail', e.target.value)}
+                    placeholder="Enter user's email address"
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-700)' }} htmlFor="addUserPassword">
+                    Password *
+                  </label>
+                  <input
+                    id="addUserPassword"
+                    type="password"
+                    className="form-input"
+                    value={addUserPassword}
+                    onChange={(e) => this.handleAddUserChange('addUserPassword', e.target.value)}
+                    placeholder="Min 6 characters"
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={this.handleAddUserCancel}
+                    disabled={addUserLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px',
+                      border: '1px solid var(--color-gray-300, #d1d5db)',
+                      background: '#fff', color: 'var(--color-gray-700)',
+                      cursor: 'pointer', fontSize: '0.875rem',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addUserLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px', border: 'none',
+                      background: 'var(--color-primary, #1d4ed8)', color: '#fff',
+                      cursor: addUserLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '0.875rem', opacity: addUserLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {addUserLoading ? 'Adding...' : 'Add User'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
 
         {/* Delete result snackbar */}
         {deleteSnackbarOpen && (
