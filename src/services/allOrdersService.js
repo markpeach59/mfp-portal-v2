@@ -7,4 +7,8 @@ export function getAllOrders() {
   return http.get(apiEndPoint);
 }
 
+export function deleteOrder(id) {
+  return http.delete(config.apiURL + "/orders/" + id);
+}
+
 
