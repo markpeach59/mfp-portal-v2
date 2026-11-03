@@ -10,3 +10,11 @@ export function getAllQuotes() {
 export function deleteQuote(id) {
   return http.delete(config.apiURL + "/quotes/" + id);
 }
+
+export function getOldQuotesCount() {
+  return http.get(config.apiURL + "/quotes/bulk/old");
+}
+
+export function deleteOldQuotes() {
+  return http.delete(config.apiURL + "/quotes/bulk/old");
+}

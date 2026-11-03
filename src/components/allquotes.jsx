@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { getAllQuotes, deleteQuote } from "../services/allQuotesService";
+import { getAllQuotes, deleteQuote, getOldQuotesCount, deleteOldQuotes } from "../services/allQuotesService";
 import { getUsers } from "../services/userService";
 import { getDealers } from "../services/dealerService";
 import Reassignquote from "./reassignquote";
@@ -17,6 +17,10 @@ class AllQuotes extends Component {
     deleteDialogOpen: false,
     deleteTarget: null,
     deleteLoading: false,
+    bulkDialogOpen: false,
+    bulkOldCount: null,
+    bulkCutoffDate: null,
+    bulkLoading: false,
     snackbarOpen: false,
     snackbarMessage: "",
   };
@@ -81,6 +85,45 @@ class AllQuotes extends Component {
     }
   };
 
+  handleBulkDeleteClick = async () => {
+    const { data } = await getOldQuotesCount();
+    this.setState({
+      bulkDialogOpen: true,
+      bulkOldCount: data.count,
+      bulkCutoffDate: data.cutoffDate,
+    });
+  };
+
+  handleBulkDeleteCancel = () => {
+    this.setState({ bulkDialogOpen: false, bulkOldCount: null, bulkCutoffDate: null });
+  };
+
+  handleBulkDeleteConfirm = async () => {
+    this.setState({ bulkLoading: true });
+    try {
+      const { data } = await deleteOldQuotes();
+      const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+      const remainingQuotes = this.state.quotes.filter(q => new Date(q.createdAt) >= cutoff);
+      this.setState({
+        quotes: remainingQuotes,
+        bulkDialogOpen: false,
+        bulkOldCount: null,
+        bulkCutoffDate: null,
+        bulkLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: `${data.deletedCount} old quote${data.deletedCount !== 1 ? 's' : ''} deleted.`,
+      });
+    } catch (ex) {
+      this.setState({
+        bulkLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: "Failed to delete old quotes. Please try again.",
+      });
+    }
+  };
+
+
+
   handleSnackbarClose = () => {
     this.setState({ snackbarOpen: false, snackbarMessage: "" });
   };
@@ -98,6 +141,10 @@ class AllQuotes extends Component {
       deleteLoading,
       snackbarOpen,
       snackbarMessage,
+      bulkDialogOpen,
+      bulkOldCount,
+      bulkCutoffDate,
+      bulkLoading,
     } = this.state;
     const { length: count } = t;
 
@@ -174,9 +221,27 @@ class AllQuotes extends Component {
             Back to Dashboard
           </Link>
 
-          <div className="mb-lg">
-            <h2 className="page-title">All Quotes</h2>
-            <p className="page-subtitle">View and manage all quotes across the system</p>
+          <div className="mb-lg" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div>
+              <h2 className="page-title">All Quotes</h2>
+              <p className="page-subtitle">View and manage all quotes across the system</p>
+            </div>
+            {isAdmin && (
+              <button
+                onClick={this.handleBulkDeleteClick}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '8px 16px', borderRadius: '4px', border: 'none',
+                  background: '#f59e0b', color: '#fff',
+                  fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Old Quotes
+              </button>
+            )}
           </div>
 
           {count === 0 ? (
@@ -339,6 +404,85 @@ class AllQuotes extends Component {
             </>
           )}
         </main>
+
+        {/* Bulk Delete Old Quotes Dialog */}
+        {bulkDialogOpen && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '480px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Delete Old Quotes
+              </h3>
+
+              {bulkOldCount === 0 ? (
+                <>
+                  <p style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-700)' }}>
+                    There are no quotes older than 90 days. Nothing to delete.
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={this.handleBulkDeleteCancel}
+                      style={{
+                        padding: '8px 18px', borderRadius: '4px',
+                        border: '1px solid var(--color-gray-300, #d1d5db)',
+                        background: '#fff', color: 'var(--color-gray-700)',
+                        cursor: 'pointer', fontSize: '0.875rem',
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{
+                    background: '#fffbeb', border: '1px solid #f59e0b',
+                    borderRadius: '6px', padding: '0.75rem 1rem', marginBottom: '1.25rem',
+                  }}>
+                    <p style={{ margin: '0 0 0.25rem', fontWeight: '600', color: '#92400e', fontSize: '0.875rem' }}>
+                      ⚠ This will permanently delete {bulkOldCount} quote{bulkOldCount !== 1 ? 's' : ''}
+                    </p>
+                    <p style={{ margin: 0, color: '#92400e', fontSize: '0.875rem' }}>
+                      All quotes created before {bulkCutoffDate ? new Date(bulkCutoffDate).toLocaleDateString('en-GB') : ''} will be removed. Orders are not affected. This cannot be undone.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                    <button
+                      onClick={this.handleBulkDeleteCancel}
+                      disabled={bulkLoading}
+                      style={{
+                        padding: '8px 18px', borderRadius: '4px',
+                        border: '1px solid var(--color-gray-300, #d1d5db)',
+                        background: '#fff', color: 'var(--color-gray-700)',
+                        cursor: 'pointer', fontSize: '0.875rem',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={this.handleBulkDeleteConfirm}
+                      disabled={bulkLoading}
+                      style={{
+                        padding: '8px 18px', borderRadius: '4px', border: 'none',
+                        background: '#f59e0b', color: '#fff',
+                        cursor: bulkLoading ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem', opacity: bulkLoading ? 0.7 : 1,
+                      }}
+                    >
+                      {bulkLoading ? 'Deleting...' : `Delete ${bulkOldCount} Quote${bulkOldCount !== 1 ? 's' : ''}`}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
 
         {/* Delete Quote Confirmation Dialog */}
         {deleteDialogOpen && deleteTarget && (
