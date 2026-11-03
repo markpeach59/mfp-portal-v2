@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { Component } from "react";
 import { brandConfig } from "../config/brand";
 import { Link } from "react-router-dom";
-import { getUsers, getUserSummary, deleteUser, registerUser } from "../services/userService";
+import { getUsers, getUserSummary, deleteUser, registerUser, resetUserPassword, revokeUserLogin } from "../services/userService";
 import { getDealers } from "../services/dealerService";
 import Assigndealer from "./assigndealer";
 import { assignDealertouser, removeDealerfromuser } from "../services/userService";
@@ -20,6 +20,16 @@ class ListAllUsers extends Component {
     deleteLoading: false,
     deleteSnackbarOpen: false,
     deleteSnackbarMessage: "",
+    // reset password dialog state
+    resetPasswordDialogOpen: false,
+    resetPasswordTarget: null,
+    resetPasswordValue: "",
+    resetPasswordLoading: false,
+    resetPasswordError: null,
+    // revoke login dialog state
+    revokeDialogOpen: false,
+    revokeTarget: null,
+    revokeLoading: false,
     // add user dialog state
     addUserDialogOpen: false,
     addUserName: "",
@@ -111,6 +121,77 @@ class ListAllUsers extends Component {
     this.setState({ deleteSnackbarOpen: false, deleteSnackbarMessage: "" });
   };
 
+  // Reset Password handlers
+  handleResetPasswordOpen = (targetUser) => {
+    this.setState({ resetPasswordDialogOpen: true, resetPasswordTarget: targetUser, resetPasswordValue: "", resetPasswordError: null });
+  };
+
+  handleResetPasswordCancel = () => {
+    this.setState({ resetPasswordDialogOpen: false, resetPasswordTarget: null, resetPasswordValue: "", resetPasswordError: null });
+  };
+
+  handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    const { resetPasswordTarget, resetPasswordValue } = this.state;
+
+    if (!resetPasswordValue || resetPasswordValue.length < 6) {
+      this.setState({ resetPasswordError: "Password must be at least 6 characters." });
+      return;
+    }
+
+    this.setState({ resetPasswordLoading: true, resetPasswordError: null });
+
+    try {
+      await resetUserPassword(resetPasswordTarget._id, resetPasswordValue);
+      this.setState({
+        resetPasswordDialogOpen: false,
+        resetPasswordTarget: null,
+        resetPasswordValue: "",
+        resetPasswordLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: `Password reset for ${resetPasswordTarget.name}. Their session has been revoked.`,
+      });
+    } catch (ex) {
+      this.setState({
+        resetPasswordLoading: false,
+        resetPasswordError: ex.response?.data || "Failed to reset password. Please try again.",
+      });
+    }
+  };
+
+  // Revoke Login handlers
+  handleRevokeOpen = (targetUser) => {
+    this.setState({ revokeDialogOpen: true, revokeTarget: targetUser });
+  };
+
+  handleRevokeCancel = () => {
+    this.setState({ revokeDialogOpen: false, revokeTarget: null });
+  };
+
+  handleRevokeConfirm = async () => {
+    const { revokeTarget } = this.state;
+    this.setState({ revokeLoading: true });
+
+    try {
+      await revokeUserLogin(revokeTarget._id);
+      this.setState({
+        revokeDialogOpen: false,
+        revokeTarget: null,
+        revokeLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: `${revokeTarget.name}'s session has been revoked. They will be logged out on their next action.`,
+      });
+    } catch (ex) {
+      this.setState({
+        revokeLoading: false,
+        deleteSnackbarOpen: true,
+        deleteSnackbarMessage: "Failed to revoke session. Please try again.",
+      });
+    }
+  };
+
+
+
   handleAddUserOpen = () => {
     this.setState({ addUserDialogOpen: true, addUserName: "", addUserEmail: "", addUserPassword: "", addUserError: null });
   };
@@ -171,6 +252,14 @@ class ListAllUsers extends Component {
       deleteLoading,
       deleteSnackbarOpen,
       deleteSnackbarMessage,
+      resetPasswordDialogOpen,
+      resetPasswordTarget,
+      resetPasswordValue,
+      resetPasswordLoading,
+      resetPasswordError,
+      revokeDialogOpen,
+      revokeTarget,
+      revokeLoading,
       addUserDialogOpen,
       addUserName,
       addUserEmail,
@@ -311,24 +400,58 @@ class ListAllUsers extends Component {
                               dealers={d}
                               onAssigndealer={this.handleAssigndealer}
                             />
-                            {/* Only show Delete for non-admin users who are not the logged-in user */}
+                            {/* Reset Password, Revoke Login, Delete — only for non-admin users, not the logged-in user */}
                             {isAdmin && !x.isAdmin && x._id !== user._id && (
-                              <button
-                                onClick={() => this.handleDeleteClick(x)}
-                                style={{
-                                  background: 'none',
-                                  border: '1px solid var(--color-danger, #dc2626)',
-                                  color: 'var(--color-danger, #dc2626)',
-                                  borderRadius: '4px',
-                                  padding: '4px 10px',
-                                  fontSize: '0.8rem',
-                                  cursor: 'pointer',
-                                  whiteSpace: 'nowrap',
-                                }}
-                                title="Delete user"
-                              >
-                                Delete
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => this.handleResetPasswordOpen(x)}
+                                  style={{
+                                    background: 'none',
+                                    border: '1px solid var(--color-primary, #1d4ed8)',
+                                    color: 'var(--color-primary, #1d4ed8)',
+                                    borderRadius: '4px',
+                                    padding: '4px 10px',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                  title="Reset password"
+                                >
+                                  Reset Password
+                                </button>
+                                <button
+                                  onClick={() => this.handleRevokeOpen(x)}
+                                  style={{
+                                    background: 'none',
+                                    border: '1px solid #f59e0b',
+                                    color: '#92400e',
+                                    borderRadius: '4px',
+                                    padding: '4px 10px',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                  title="Revoke login session"
+                                >
+                                  Revoke Login
+                                </button>
+                                <button
+                                  onClick={() => this.handleDeleteClick(x)}
+                                  style={{
+                                    background: 'none',
+                                    border: '1px solid var(--color-danger, #dc2626)',
+                                    color: 'var(--color-danger, #dc2626)',
+                                    borderRadius: '4px',
+                                    padding: '4px 10px',
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                  title="Delete user"
+                                >
+                                  Delete
+                                </button>
+                              </>
                             )}
                           </div>
                         </td>
@@ -388,6 +511,130 @@ class ListAllUsers extends Component {
             </a>
           </div>
         </footer>
+
+        {/* Reset Password Dialog */}
+        {resetPasswordDialogOpen && resetPasswordTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Reset Password
+              </h3>
+              <p style={{ margin: '0 0 1rem', color: 'var(--color-gray-700)' }}>
+                Set a new temporary password for <strong>{resetPasswordTarget.name}</strong>.
+                Their current session will be revoked immediately.
+              </p>
+
+              {resetPasswordError && (
+                <div style={{
+                  background: 'var(--color-danger-bg, #fef2f2)',
+                  border: '1px solid var(--color-danger, #dc2626)',
+                  borderRadius: '6px', padding: '0.75rem 1rem', marginBottom: '1rem',
+                  color: 'var(--color-danger, #dc2626)', fontSize: '0.875rem',
+                }}>
+                  {resetPasswordError}
+                </div>
+              )}
+
+              <form onSubmit={this.handleResetPasswordSubmit}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-700)' }}>
+                    New Password *
+                  </label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={resetPasswordValue}
+                    onChange={(e) => this.setState({ resetPasswordValue: e.target.value, resetPasswordError: null })}
+                    placeholder="Min 6 characters"
+                    autoFocus
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={this.handleResetPasswordCancel}
+                    disabled={resetPasswordLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px',
+                      border: '1px solid var(--color-gray-300, #d1d5db)',
+                      background: '#fff', color: 'var(--color-gray-700)',
+                      cursor: 'pointer', fontSize: '0.875rem',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetPasswordLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px', border: 'none',
+                      background: 'var(--color-primary, #1d4ed8)', color: '#fff',
+                      cursor: resetPasswordLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '0.875rem', opacity: resetPasswordLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {resetPasswordLoading ? 'Resetting...' : 'Reset Password'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Revoke Login Dialog */}
+        {revokeDialogOpen && revokeTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Revoke Login Session
+              </h3>
+              <p style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-700)' }}>
+                This will immediately invalidate <strong>{revokeTarget.name}</strong>'s current session.
+                They will be redirected to the login page on their next action. Their password is not changed.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={this.handleRevokeCancel}
+                  disabled={revokeLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px',
+                    border: '1px solid var(--color-gray-300, #d1d5db)',
+                    background: '#fff', color: 'var(--color-gray-700)',
+                    cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={this.handleRevokeConfirm}
+                  disabled={revokeLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: 'none',
+                    background: '#f59e0b', color: '#fff',
+                    cursor: revokeLoading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.875rem', opacity: revokeLoading ? 0.7 : 1,
+                  }}
+                >
+                  {revokeLoading ? 'Revoking...' : 'Revoke Login'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Delete Confirmation Dialog */}
         {deleteDialogOpen && deleteTarget && (
