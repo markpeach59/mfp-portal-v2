@@ -19,3 +19,7 @@ export function getDealerDetail(id) {
 export function setDealerRestricted(id, isRestricted) {
   return http.patch(apiEndPoint + "/" + id, { isRestricted });
 }
+
+export function deleteDealer(id) {
+  return http.delete(apiEndPoint + "/" + id);
+}

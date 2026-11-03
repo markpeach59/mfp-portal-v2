@@ -1,18 +1,24 @@
 import React, { Component } from "react";
 import { brandConfig, isSAMUK } from "../config/brand";
 import { Link } from "react-router-dom";
-import { getDealers, setDealerRestricted } from "../services/dealerService";
+import { getDealers, setDealerRestricted, deleteDealer } from "../services/dealerService";
+import { getUsers } from "../services/userService";
 import auth from "../services/authService";
 
 class ListAllDealers extends Component {
   state = {
     dealers: [],
+    users: [],
     user: null,
     // restrict dialog state
     restrictDialogOpen: false,
     restrictTarget: null,     // dealer object
     restrictAction: null,     // 'restrict' | 'unrestrict'
     restrictLoading: false,
+    // delete dialog state
+    deleteDialogOpen: false,
+    deleteTarget: null,
+    deleteLoading: false,
     snackbarOpen: false,
     snackbarMessage: "",
   };
@@ -21,8 +27,11 @@ class ListAllDealers extends Component {
     const user = auth.getCurrentUser();
     this.setState({ user });
 
-    const { data: dealers } = await getDealers();
-    this.setState({ dealers });
+    const [{ data: dealers }, { data: users }] = await Promise.all([
+      getDealers(),
+      getUsers(),
+    ]);
+    this.setState({ dealers, users });
   }
 
   getUserInitials(fullname) {
@@ -84,18 +93,62 @@ class ListAllDealers extends Component {
     this.setState({ snackbarOpen: false, snackbarMessage: "" });
   };
 
+  handleDeleteClick = (dealer) => {
+    this.setState({ deleteDialogOpen: true, deleteTarget: dealer });
+  };
+
+  handleDeleteCancel = () => {
+    this.setState({ deleteDialogOpen: false, deleteTarget: null });
+  };
+
+  handleDeleteConfirm = async () => {
+    const { deleteTarget, dealers } = this.state;
+    this.setState({ deleteLoading: true });
+
+    try {
+      await deleteDealer(deleteTarget._id);
+      const updatedDealers = dealers.filter(d => d._id !== deleteTarget._id);
+      this.setState({
+        dealers: updatedDealers,
+        deleteDialogOpen: false,
+        deleteTarget: null,
+        deleteLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: `${deleteTarget.dealername} has been deleted.`,
+      });
+    } catch (ex) {
+      this.setState({
+        deleteLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: "Failed to delete dealer. Please try again.",
+      });
+    }
+  };
+
   render() {
     const {
       dealers: d,
+      users,
       user,
       restrictDialogOpen,
       restrictTarget,
       restrictAction,
       restrictLoading,
+      deleteDialogOpen,
+      deleteTarget,
+      deleteLoading,
       snackbarOpen,
       snackbarMessage,
     } = this.state;
     const { length: count } = d;
+
+    // Build a map of dealerId -> assigned user count
+    const userCountByDealer = {};
+    users.forEach(u => {
+      if (u.dealerId) {
+        userCountByDealer[u.dealerId] = (userCountByDealer[u.dealerId] || 0) + 1;
+      }
+    });
 
     if (!user) return <p>Loading...</p>;
 
@@ -185,6 +238,40 @@ class ListAllDealers extends Component {
                       </div>
                     </div>
                     
+
+                    {/* Delete button — only shown to admins, only enabled when 0 users assigned */}
+                    {isAdmin && (() => {
+                      const assignedCount = userCountByDealer[dealer._id] || 0;
+                      const canDelete = assignedCount === 0;
+                      return (
+                        <div style={{ marginTop: '0.75rem' }}>
+                          <button
+                            onClick={() => canDelete && this.handleDeleteClick(dealer)}
+                            disabled={!canDelete}
+                            title={canDelete ? 'Delete dealer' : `Cannot delete — ${assignedCount} user${assignedCount !== 1 ? 's are' : ' is'} assigned to this dealer`}
+                            style={{
+                              background: 'none',
+                              border: `1px solid ${canDelete ? 'var(--color-danger, #dc2626)' : 'var(--color-gray-300, #d1d5db)'}`,
+                              color: canDelete ? 'var(--color-danger, #dc2626)' : 'var(--color-gray-400, #9ca3af)',
+                              borderRadius: '4px',
+                              padding: '3px 10px',
+                              fontSize: '0.775rem',
+                              cursor: canDelete ? 'pointer' : 'not-allowed',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Delete Dealer
+                          </button>
+                          {!canDelete && (
+                            <p style={{ fontSize: '0.7rem', color: 'var(--color-gray-400, #9ca3af)', margin: '0.25rem 0 0' }}>
+                              {assignedCount} user{assignedCount !== 1 ? 's' : ''} assigned
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
+
+
                     {!isSAMUK && (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
                         {dealer.isRestricted ? (
@@ -323,6 +410,54 @@ class ListAllDealers extends Component {
             </div>
           </div>
         )}
+
+        {/* Delete Dealer Confirmation Dialog */}
+        {deleteDialogOpen && deleteTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Delete Dealer
+              </h3>
+              <p style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-700)' }}>
+                Are you sure you want to delete <strong>{deleteTarget.dealername}</strong>?
+                This action cannot be undone.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={this.handleDeleteCancel}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px',
+                    border: '1px solid var(--color-gray-300, #d1d5db)',
+                    background: '#fff', color: 'var(--color-gray-700)',
+                    cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={this.handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: 'none',
+                    background: 'var(--color-danger, #dc2626)', color: '#fff',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.875rem', opacity: deleteLoading ? 0.7 : 1,
+                  }}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete Dealer'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Snackbar */}
         {snackbarOpen && (
