@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { getDealers, setDealerRestricted, deleteDealer } from "../services/dealerService";
+import { getDealers, setDealerRestricted, deleteDealer, registerDealer } from "../services/dealerService";
 import { getUsers } from "../services/userService";
 import auth from "../services/authService";
 
@@ -18,6 +18,11 @@ class ListAllDealers extends Component {
     deleteDialogOpen: false,
     deleteTarget: null,
     deleteLoading: false,
+    // add dealer dialog state
+    addDialogOpen: false,
+    addDealerName: "",
+    addLoading: false,
+    addError: null,
     snackbarOpen: false,
     snackbarMessage: "",
   };
@@ -85,6 +90,49 @@ class ListAllDealers extends Component {
         snackbarOpen: true,
         snackbarMessage: "Failed to update dealer. Please try again.",
       });
+
+  handleAddOpen = () => {
+    this.setState({ addDialogOpen: true, addDealerName: "", addError: null });
+  };
+
+  handleAddCancel = () => {
+    this.setState({ addDialogOpen: false, addDealerName: "", addError: null });
+  };
+
+  handleAddNameChange = (e) => {
+    this.setState({ addDealerName: e.target.value, addError: null });
+  };
+
+  handleAddSubmit = async (e) => {
+    e.preventDefault();
+    const { addDealerName, dealers } = this.state;
+
+    if (!addDealerName.trim()) {
+      this.setState({ addError: "Dealer name is required." });
+      return;
+    }
+
+    this.setState({ addLoading: true, addError: null });
+
+    try {
+      const { data: newDealer } = await registerDealer(addDealerName.trim());
+      this.setState({
+        dealers: [...dealers, newDealer],
+        addDialogOpen: false,
+        addDealerName: "",
+        addLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: `${newDealer.dealername} has been added.`,
+      });
+    } catch (ex) {
+      this.setState({
+        addLoading: false,
+        addError: ex.response?.data || "Failed to add dealer. Please try again.",
+      });
+    }
+  };
+
+
     }
   };
 
@@ -138,6 +186,10 @@ class ListAllDealers extends Component {
       deleteDialogOpen,
       deleteTarget,
       deleteLoading,
+      addDialogOpen,
+      addDealerName,
+      addLoading,
+      addError,
       snackbarOpen,
       snackbarMessage,
     } = this.state;
@@ -194,9 +246,27 @@ class ListAllDealers extends Component {
             Back to Dashboard
           </Link>
 
-          <div className="mb-lg">
-            <h2 className="page-title">Dealer Management</h2>
-            <p className="page-subtitle">View and manage dealer accounts</p>
+          <div className="mb-lg" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div>
+              <h2 className="page-title">Dealer Management</h2>
+              <p className="page-subtitle">View and manage dealer accounts</p>
+            </div>
+            {isAdmin && (
+              <button
+                onClick={this.handleAddOpen}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '8px 16px', borderRadius: '4px', border: 'none',
+                  background: 'var(--color-primary, #1d4ed8)', color: '#fff',
+                  fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                }}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Dealer
+              </button>
+            )}
           </div>
 
           {count === 0 ? (
@@ -451,6 +521,81 @@ class ListAllDealers extends Component {
                   {deleteLoading ? 'Deleting...' : 'Delete Dealer'}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+
+        {/* Add Dealer Modal */}
+        {addDialogOpen && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Add Dealer
+              </h3>
+
+              {addError && (
+                <div style={{
+                  background: 'var(--color-danger-bg, #fef2f2)',
+                  border: '1px solid var(--color-danger, #dc2626)',
+                  borderRadius: '6px', padding: '0.75rem 1rem', marginBottom: '1rem',
+                  color: 'var(--color-danger, #dc2626)', fontSize: '0.875rem',
+                }}>
+                  {addError}
+                </div>
+              )}
+
+              <form onSubmit={this.handleAddSubmit}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label className="form-label" htmlFor="addDealerName" style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-700)' }}>
+                    Dealer Name *
+                  </label>
+                  <input
+                    id="addDealerName"
+                    type="text"
+                    className="form-input"
+                    value={addDealerName}
+                    onChange={this.handleAddNameChange}
+                    placeholder="Enter dealer company name"
+                    autoFocus
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={this.handleAddCancel}
+                    disabled={addLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px',
+                      border: '1px solid var(--color-gray-300, #d1d5db)',
+                      background: '#fff', color: 'var(--color-gray-700)',
+                      cursor: 'pointer', fontSize: '0.875rem',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={addLoading}
+                    style={{
+                      padding: '8px 18px', borderRadius: '4px', border: 'none',
+                      background: 'var(--color-primary, #1d4ed8)', color: '#fff',
+                      cursor: addLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '0.875rem', opacity: addLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {addLoading ? 'Adding...' : 'Add Dealer'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
