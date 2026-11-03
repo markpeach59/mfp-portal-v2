@@ -26,3 +26,11 @@ export function getUserSummary(id) {
 export function deleteUser(id) {
   return http.delete(apiEndPoint + "/" + id);
 }
+
+export function resetUserPassword(id, password) {
+  return http.post(apiEndPoint + "/" + id + "/reset-password", { password });
+}
+
+export function revokeUserLogin(id) {
+  return http.post(apiEndPoint + "/" + id + "/revoke", {});
+}
