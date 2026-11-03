@@ -6,3 +6,7 @@ const apiEndPoint = config.apiURL + "/quotes/all";
 export function getAllQuotes() {
   return http.get(apiEndPoint);
 }
+
+export function deleteQuote(id) {
+  return http.delete(config.apiURL + "/quotes/" + id);
+}

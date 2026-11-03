@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { Component } from "react";
 import { brandConfig } from "../config/brand";
 import { Link } from "react-router-dom";
-import { getAllQuotes } from "../services/allQuotesService";
+import { getAllQuotes, deleteQuote } from "../services/allQuotesService";
 import { getUsers } from "../services/userService";
 import { getDealers } from "../services/dealerService";
 import Reassignquote from "./reassignquote";
@@ -14,7 +14,12 @@ class AllQuotes extends Component {
     quotes: [],
     users: [],
     dealers: [],
-    user: null
+    user: null,
+    deleteDialogOpen: false,
+    deleteTarget: null,
+    deleteLoading: false,
+    snackbarOpen: false,
+    snackbarMessage: "",
   };
 
   async componentDidMount() {
@@ -46,8 +51,53 @@ class AllQuotes extends Component {
     reassignQuote(quoteid, newowner);
   };
 
+  handleDeleteClick = (quote) => {
+    this.setState({ deleteDialogOpen: true, deleteTarget: quote });
+  };
+
+  handleDeleteCancel = () => {
+    this.setState({ deleteDialogOpen: false, deleteTarget: null });
+  };
+
+  handleDeleteConfirm = async () => {
+    const { deleteTarget, quotes } = this.state;
+    this.setState({ deleteLoading: true });
+
+    try {
+      await deleteQuote(deleteTarget._id);
+      this.setState({
+        quotes: quotes.filter(q => q._id !== deleteTarget._id),
+        deleteDialogOpen: false,
+        deleteTarget: null,
+        deleteLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: `Quote ${deleteTarget.quoteRef || ''} deleted.`,
+      });
+    } catch (ex) {
+      this.setState({
+        deleteLoading: false,
+        snackbarOpen: true,
+        snackbarMessage: "Failed to delete quote. Please try again.",
+      });
+    }
+  };
+
+  handleSnackbarClose = () => {
+    this.setState({ snackbarOpen: false, snackbarMessage: "" });
+  };
+
   render() {
-    const { quotes: t, users: u, dealers: d, user } = this.state;
+    const {
+      quotes: t,
+      users: u,
+      dealers: d,
+      user,
+      deleteDialogOpen,
+      deleteTarget,
+      deleteLoading,
+      snackbarOpen,
+      snackbarMessage,
+    } = this.state;
     const { length: count } = t;
 
     if (!user) return <p>Loading...</p>;
@@ -254,12 +304,31 @@ class AllQuotes extends Component {
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          <Reassignquote
-                            quoteid={x._id}
-                            quoteowner={x.userid}
-                            users={u}
-                            onReassign={this.handleReassign}
-                          />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <Reassignquote
+                              quoteid={x._id}
+                              quoteowner={x.userid}
+                              users={u}
+                              onReassign={this.handleReassign}
+                            />
+                            {isAdmin && (
+                              <button
+                                onClick={() => this.handleDeleteClick(x)}
+                                style={{
+                                  background: 'none',
+                                  border: '1px solid var(--color-danger, #dc2626)',
+                                  color: 'var(--color-danger, #dc2626)',
+                                  borderRadius: '4px',
+                                  padding: '4px 10px',
+                                  fontSize: '0.8rem',
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -269,6 +338,73 @@ class AllQuotes extends Component {
             </>
           )}
         </main>
+
+        {/* Delete Quote Confirmation Dialog */}
+        {deleteDialogOpen && deleteTarget && (
+          <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          }}>
+            <div style={{
+              background: '#fff', borderRadius: '8px', padding: '2rem',
+              maxWidth: '460px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }}>
+              <h3 style={{ margin: '0 0 0.75rem', color: 'var(--color-gray-800)', fontSize: '1.1rem' }}>
+                Delete Quote
+              </h3>
+              <p style={{ margin: '0 0 1.25rem', color: 'var(--color-gray-700)' }}>
+                Are you sure you want to delete quote <strong>{deleteTarget.quoteRef}</strong>
+                {deleteTarget.model ? <> for <strong>{deleteTarget.model}</strong></> : null}?
+                This action cannot be undone.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={this.handleDeleteCancel}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px',
+                    border: '1px solid var(--color-gray-300, #d1d5db)',
+                    background: '#fff', color: 'var(--color-gray-700)',
+                    cursor: 'pointer', fontSize: '0.875rem',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={this.handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  style={{
+                    padding: '8px 18px', borderRadius: '4px', border: 'none',
+                    background: 'var(--color-danger, #dc2626)', color: '#fff',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.875rem', opacity: deleteLoading ? 0.7 : 1,
+                  }}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete Quote'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Snackbar */}
+        {snackbarOpen && (
+          <div style={{
+            position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+            background: '#1f2937', color: '#fff', padding: '0.75rem 1.5rem',
+            borderRadius: '6px', fontSize: '0.875rem', zIndex: 1001,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}>
+            {snackbarMessage}
+            <button
+              onClick={this.handleSnackbarClose}
+              style={{ marginLeft: '1rem', background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: '1rem' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
 
         {/* Footer */}
         <footer className="footer">
